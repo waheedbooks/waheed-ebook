@@ -6,15 +6,16 @@ const crypto = require("crypto");
 const Book = require("../models/Book");
 const { protect, adminOnly } = require("../middleware/auth");
 const { extractFromFile } = require("../utils/extractContent");
+const { uploadToR2, deleteFromR2 } = require("../utils/storage");
 
 const router = express.Router();
 router.use(protect, adminOnly);
 
-const BOOKS_DIR = path.join(__dirname, "..", "uploads", "books");
-fs.mkdirSync(BOOKS_DIR, { recursive: true });
+const TMP_DIR = path.join(__dirname, "..", "uploads");
+fs.mkdirSync(TMP_DIR, { recursive: true });
 
 const upload = multer({
-  dest: path.join(__dirname, "..", "uploads"),
+  dest: TMP_DIR,
   limits: { fileSize: 25 * 1024 * 1024 }, // 25MB
   fileFilter: (req, file, cb) => {
     const allowed = [
@@ -50,8 +51,8 @@ router.post("/books", upload.single("file"), async (req, res) => {
     let pdfFile = "";
     if (req.file.mimetype === "application/pdf") {
       pdfFile = `${crypto.randomUUID()}.pdf`;
-      persistedPath = path.join(BOOKS_DIR, pdfFile);
-      fs.copyFileSync(tempPath, persistedPath);
+      await uploadToR2(tempPath, `books/${pdfFile}`, "application/pdf");
+      persistedPath = pdfFile;
     }
 
     const book = await Book.create({
@@ -68,8 +69,8 @@ router.post("/books", upload.single("file"), async (req, res) => {
     res.status(201).json({ id: book._id, title: book.title, chapterCount: chaptersWithOrder.length });
   } catch (err) {
     console.error("Upload book error:", err);
-    if (persistedPath && fs.existsSync(persistedPath)) {
-      fs.unlink(persistedPath, () => {});
+    if (persistedPath) {
+      await deleteFromR2(`books/${persistedPath}`);
     }
     res.status(500).json({ message: err.message || "Failed to process upload" });
   } finally {
@@ -111,8 +112,7 @@ router.delete("/books/:id", async (req, res) => {
   const book = await Book.findByIdAndDelete(req.params.id);
   if (!book) return res.status(404).json({ message: "Book not found" });
   if (book.pdfFile) {
-    const filePath = path.join(BOOKS_DIR, book.pdfFile);
-    fs.unlink(filePath, () => {});
+    await deleteFromR2(`books/${book.pdfFile}`);
   }
   res.json({ message: "Book deleted" });
 });
