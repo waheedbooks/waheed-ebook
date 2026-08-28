@@ -12,6 +12,12 @@ const paymentRoutes = require("./routes/paymentRoutes");
 
 const app = express();
 
+// Render (and most hosts) sit behind a reverse proxy, which sets
+// X-Forwarded-For to the real client IP. Without this, express-rate-limit
+// throws ERR_ERL_UNEXPECTED_X_FORWARDED_FOR and crashes any rate-limited
+// request — including the payment verify/webhook routes.
+app.set("trust proxy", 1);
+
 connectDB();
 
 app.use(helmet());
