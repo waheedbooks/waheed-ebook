@@ -3,6 +3,11 @@ import { Link } from "react-router-dom";
 import api from "../api";
 import { shelfColor } from "../lib/shelfColor";
 
+const API_BASE = import.meta.env.VITE_API_URL;
+function coverSrc(book) {
+  return book.coverImage ? `${API_BASE}/books/${book._id}/cover` : null;
+}
+
 export default function BookList() {
   const [books, setBooks] = useState([]);
   const [error, setError] = useState("");
@@ -30,22 +35,30 @@ export default function BookList() {
       {books.length === 0 && <p className="muted">No books published yet. Check back soon.</p>}
 
       <div className="shelf-row">
-        {books.map((book) => (
-          <Link
-            to={`/books/${book._id}`}
-            key={book._id}
-            className="book-card"
-            style={{ "--shelf-color": shelfColor(book._id) }}
-          >
-            <div>
-              <h3>{book.title}</h3>
-              {book.author && <p className="muted">by {book.author}</p>}
-            </div>
-            <span className="price">
-              {book.currency?.toUpperCase()} {book.price}
-            </span>
-          </Link>
-        ))}
+        {books.map((book) => {
+          const cover = coverSrc(book);
+          return (
+            <Link
+              to={`/books/${book._id}`}
+              key={book._id}
+              className={`book-card ${cover ? "book-card-has-cover" : ""}`}
+              style={{ "--shelf-color": shelfColor(book._id) }}
+            >
+              {cover && (
+                <img src={cover} alt="" className="book-card-bg" aria-hidden="true" />
+              )}
+              <div className="book-card-inner">
+                <div>
+                  <h3>{book.title}</h3>
+                  {book.author && <p className="muted">by {book.author}</p>}
+                </div>
+                <span className="price">
+                  {book.currency?.toUpperCase()} {book.price}
+                </span>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
