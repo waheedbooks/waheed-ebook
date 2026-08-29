@@ -18,6 +18,11 @@ const upload = multer({
   dest: TMP_DIR,
   limits: { fileSize: 25 * 1024 * 1024 }, // 25MB
   fileFilter: (req, file, cb) => {
+    if (file.fieldname === "coverImage") {
+      const allowedImages = ["image/jpeg", "image/png", "image/webp"];
+      if (allowedImages.includes(file.mimetype)) return cb(null, true);
+      return cb(new Error("Cover image must be a .jpg, .png, or .webp file"));
+    }
     const allowed = [
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -28,20 +33,29 @@ const upload = multer({
   },
 });
 
-router.post("/books", upload.single("file"), async (req, res) => {
+const uploadBookFields = upload.fields([
+  { name: "file", maxCount: 1 },
+  { name: "coverImage", maxCount: 1 },
+]);
+
+router.post("/books", uploadBookFields, async (req, res) => {
   let tempPath;
+  let coverTempPath;
   let persistedPath;
+  let persistedCoverKey;
   try {
     const { title, author, description, price, currency } = req.body;
     if (!title || price === undefined) {
       return res.status(400).json({ message: "Title and price are required" });
     }
-    if (!req.file) {
+    const bookFile = req.files?.file?.[0];
+    const coverFile = req.files?.coverImage?.[0];
+    if (!bookFile) {
       return res.status(400).json({ message: "A .pdf or .docx file is required" });
     }
-    tempPath = req.file.path;
+    tempPath = bookFile.path;
 
-    const chapters = await extractFromFile(tempPath, req.file.mimetype);
+    const chapters = await extractFromFile(tempPath, bookFile.mimetype);
     const chaptersWithOrder = chapters.map((c, i) => ({
       title: c.title,
       order: i,
@@ -49,10 +63,19 @@ router.post("/books", upload.single("file"), async (req, res) => {
     }));
 
     let pdfFile = "";
-    if (req.file.mimetype === "application/pdf") {
+    if (bookFile.mimetype === "application/pdf") {
       pdfFile = `${crypto.randomUUID()}.pdf`;
       await uploadToR2(tempPath, `books/${pdfFile}`, "application/pdf");
       persistedPath = pdfFile;
+    }
+
+    let coverImage = "";
+    if (coverFile) {
+      coverTempPath = coverFile.path;
+      const ext = coverFile.mimetype === "image/png" ? "png" : coverFile.mimetype === "image/webp" ? "webp" : "jpg";
+      coverImage = `${crypto.randomUUID()}.${ext}`;
+      await uploadToR2(coverTempPath, `covers/${coverImage}`, coverFile.mimetype);
+      persistedCoverKey = coverImage;
     }
 
     const book = await Book.create({
@@ -63,6 +86,7 @@ router.post("/books", upload.single("file"), async (req, res) => {
       currency: currency || "usd",
       chapters: chaptersWithOrder,
       pdfFile,
+      coverImage,
       published: false,
     });
 
@@ -72,11 +96,13 @@ router.post("/books", upload.single("file"), async (req, res) => {
     if (persistedPath) {
       await deleteFromR2(`books/${persistedPath}`);
     }
+    if (persistedCoverKey) {
+      await deleteFromR2(`covers/${persistedCoverKey}`);
+    }
     res.status(500).json({ message: err.message || "Failed to process upload" });
   } finally {
-    if (tempPath && fs.existsSync(tempPath)) {
-      fs.unlink(tempPath, () => {});
-    }
+    if (tempPath && fs.existsSync(tempPath)) fs.unlink(tempPath, () => {});
+    if (coverTempPath && fs.existsSync(coverTempPath)) fs.unlink(coverTempPath, () => {});
   }
 });
 
@@ -113,6 +139,9 @@ router.delete("/books/:id", async (req, res) => {
   if (!book) return res.status(404).json({ message: "Book not found" });
   if (book.pdfFile) {
     await deleteFromR2(`books/${book.pdfFile}`);
+  }
+  if (book.coverImage) {
+    await deleteFromR2(`covers/${book.coverImage}`);
   }
   res.json({ message: "Book deleted" });
 });
