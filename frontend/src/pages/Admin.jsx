@@ -5,6 +5,7 @@ export default function Admin() {
   const [books, setBooks] = useState([]);
   const [form, setForm] = useState({ title: "", author: "", description: "", price: "", currency: "usd" });
   const [file, setFile] = useState(null);
+  const [coverImage, setCoverImage] = useState(null);
   const [status, setStatus] = useState("");
   const [uploading, setUploading] = useState(false);
 
@@ -30,6 +31,7 @@ export default function Admin() {
       const data = new FormData();
       Object.entries(form).forEach(([k, v]) => data.append(k, v));
       data.append("file", file);
+      if (coverImage) data.append("coverImage", coverImage);
 
       const res = await api.post("/admin/books", data, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -37,6 +39,7 @@ export default function Admin() {
       setStatus(`Uploaded "${res.data.title}" with ${res.data.chapterCount} chapter(s). Publish it below.`);
       setForm({ title: "", author: "", description: "", price: "", currency: "usd" });
       setFile(null);
+      setCoverImage(null);
       loadBooks();
     } catch (err) {
       setStatus(err.response?.data?.message || "Upload failed");
@@ -76,6 +79,10 @@ export default function Admin() {
           <option value="eur">EUR</option>
         </select>
         <input type="file" accept=".pdf,.docx" onChange={(e) => setFile(e.target.files[0])} required />
+        <label className="upload-form-label">
+          Cover image (optional — shown on the home page)
+          <input type="file" accept=".jpg,.jpeg,.png,.webp" onChange={(e) => setCoverImage(e.target.files[0])} />
+        </label>
         <button type="submit" disabled={uploading}>{uploading ? "Uploading…" : "Upload"}</button>
         {status && <p className="notice">{status}</p>}
       </form>
