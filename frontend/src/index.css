@@ -281,11 +281,10 @@ a:hover {
 }
 
 .book-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 230px;
-  padding: 18px 16px;
+  display: block;
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
   text-decoration: none;
   color: var(--text-on-ink);
   background: var(--shelf-color, var(--shelf-1));
@@ -296,11 +295,10 @@ a:hover {
   );
   border-radius: var(--radius-s) var(--radius-m) var(--radius-m) var(--radius-s);
   box-shadow: var(--shadow-card);
-  position: relative;
+  border-left: 4px solid rgba(0, 0, 0, 0.18);
   transition:
     transform 0.18s ease,
     box-shadow 0.18s ease;
-  border-left: 4px solid rgba(0, 0, 0, 0.18);
 }
 .book-card:hover {
   transform: translateY(-4px);
@@ -308,20 +306,43 @@ a:hover {
     0 4px 6px rgba(22, 36, 31, 0.1),
     0 16px 28px -14px rgba(22, 36, 31, 0.5);
 }
+.book-card-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.book-card-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px;
+}
+.book-card-has-cover .book-card-inner {
+  background: linear-gradient(
+    to top,
+    rgba(10, 16, 14, 0.92) 0%,
+    rgba(10, 16, 14, 0.55) 45%,
+    rgba(10, 16, 14, 0) 75%
+  );
+}
 .book-card h3 {
   font-family: var(--font-display);
   color: var(--text-on-ink);
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   line-height: 1.25;
-  margin: 0 0 6px;
+  margin: 0 0 4px;
 }
 .book-card .muted {
-  color: rgba(244, 239, 225, 0.72);
+  color: rgba(244, 239, 225, 0.78);
   font-size: 0.85rem;
 }
 .book-card .price {
   align-self: flex-start;
-  margin-top: 14px;
+  margin-top: 10px;
   font-family: var(--font-mono);
   font-size: 0.78rem;
   background: var(--brass);
@@ -365,6 +386,14 @@ a:hover {
   box-shadow: var(--shadow-card);
   flex-shrink: 0;
   border-left: 4px solid rgba(0, 0, 0, 0.18);
+}
+.book-detail-cover {
+  width: 160px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius-s) var(--radius-m) var(--radius-m) var(--radius-s);
+  box-shadow: var(--shadow-card);
+  flex-shrink: 0;
 }
 .book-detail-body {
   flex: 1;
