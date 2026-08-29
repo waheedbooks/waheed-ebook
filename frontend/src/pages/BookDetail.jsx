@@ -4,6 +4,11 @@ import api from "../api";
 import { useAuth } from "../context/AuthContext";
 import { shelfColor } from "../lib/shelfColor";
 
+const API_BASE = import.meta.env.VITE_API_URL;
+function coverSrc(book) {
+  return book.coverImage ? `${API_BASE}/books/${book.id}/cover` : null;
+}
+
 export default function BookDetail() {
   const { id } = useParams();
   const [book, setBook] = useState(null);
@@ -28,7 +33,7 @@ export default function BookDetail() {
     setError("");
     try {
       const res = await api.post("/payments/create-checkout-session", { bookId: id });
-      window.location.href = res.data.url;
+      window.location.href = res.data.url; // redirect to Stripe Checkout
     } catch (err) {
       setError(err.response?.data?.message || "Could not start checkout");
       setBuying(false);
@@ -45,7 +50,11 @@ export default function BookDetail() {
       )}
 
       <div className="book-detail-head">
-        <div className="book-detail-spine" style={{ "--shelf-color": shelfColor(book._id) }} />
+        {coverSrc(book) ? (
+          <img src={coverSrc(book)} alt={book.title} className="book-detail-cover" />
+        ) : (
+          <div className="book-detail-spine" style={{ "--shelf-color": shelfColor(book.id) }} />
+        )}
         <div className="book-detail-body">
           <span className="eyebrow">Book detail</span>
           <h2>{book.title}</h2>
