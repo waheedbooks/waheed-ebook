@@ -46,6 +46,29 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.get("/:id/cover", async (req, res) => {
+  try {
+    const book = await Book.findOne({ _id: req.params.id, published: true }).select("coverImage");
+    if (!book || !book.coverImage) return res.status(404).end();
+
+    const exists = await existsInR2(`covers/${book.coverImage}`);
+    if (!exists) return res.status(404).end();
+
+    const ext = book.coverImage.split(".").pop();
+    const contentType = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
+
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Cache-Control", "public, max-age=86400");
+
+    const r2Result = await getObjectStream(`covers/${book.coverImage}`);
+    res.setHeader("Content-Length", r2Result.ContentLength);
+    r2Result.Body.pipe(res);
+  } catch (err) {
+    console.error("Get cover error:", err);
+    res.status(500).end();
+  }
+});
+
 router.head("/:id/pdf", protect, async (req, res) => {
   try {
     const book = await Book.findById(req.params.id).select("pdfFile");
