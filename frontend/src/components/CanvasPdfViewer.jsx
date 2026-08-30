@@ -18,7 +18,7 @@ function CanvasPdfPage({ pdf, pageNum, scale, watermarkLines, scrollRoot }) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) setVisible(true);
+          setVisible(entry.isIntersecting);
         });
       },
       { root, rootMargin: "900px 0px", threshold: 0.01 }
@@ -41,11 +41,9 @@ function CanvasPdfPage({ pdf, pageNum, scale, watermarkLines, scrollRoot }) {
 
       setAspect(viewport.width / viewport.height);
 
-      const outputScale = window.devicePixelRatio || 1;
+      const outputScale = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.floor(viewport.width * outputScale);
       canvas.height = Math.floor(viewport.height * outputScale);
-      canvas.style.width = `${Math.floor(viewport.width)}px`;
-      canvas.style.height = `${Math.floor(viewport.height)}px`;
 
       const context = canvas.getContext("2d");
       const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
