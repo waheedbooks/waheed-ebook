@@ -43,6 +43,11 @@ export default function BookDetail() {
   if (error && !book) return <p className="state-line error">{error}</p>;
   if (!book) return <p className="state-line">Loading…</p>;
 
+  const hasDiscount = book.originalPrice > book.price;
+  const percentOff = hasDiscount
+    ? Math.round(100 - (book.price / book.originalPrice) * 100)
+    : 0;
+
   return (
     <div className="page">
       {searchParams.get("purchase") === "cancelled" && (
@@ -50,19 +55,48 @@ export default function BookDetail() {
       )}
 
       <div className="book-detail-head">
-        {coverSrc(book) ? (
-          <img src={coverSrc(book)} alt={book.title} className="book-detail-cover" />
-        ) : (
-          <div className="book-detail-spine" style={{ "--shelf-color": shelfColor(book.id) }} />
-        )}
+        <div className="book-detail-cover-wrap">
+          {coverSrc(book) ? (
+            <img src={coverSrc(book)} alt={book.title} className="book-detail-cover" />
+          ) : (
+            <div className="book-detail-spine" style={{ "--shelf-color": shelfColor(book.id) }} />
+          )}
+          {hasDiscount && <span className="book-detail-discount-flag">-{percentOff}%</span>}
+        </div>
+
         <div className="book-detail-body">
           <span className="eyebrow">Book detail</span>
           <h2>{book.title}</h2>
           {book.author && <p className="muted">by {book.author}</p>}
+
+          <div className="book-detail-price-tag">
+            {hasDiscount && (
+              <div className="book-detail-price-block">
+                <span className="book-detail-price-label">Original Price</span>
+                <span className="book-detail-price-original">
+                  {book.currency?.toUpperCase()} {book.originalPrice}
+                </span>
+              </div>
+            )}
+            <div className="book-detail-price-block">
+              <span className="book-detail-price-label">
+                {hasDiscount ? "Discount Price" : "Price"}
+              </span>
+              <span className="book-detail-price-current">
+                {book.currency?.toUpperCase()} {book.price}
+              </span>
+            </div>
+          </div>
+
+          {error && <p className="error">{error}</p>}
+          <button onClick={handleBuy} disabled={buying}>
+            {buying ? "Redirecting to checkout…" : `Buy for ${book.currency?.toUpperCase()} ${book.price}`}
+          </button>
+          <p className="muted" style={{ marginTop: 10 }}>
+            Already own this? Go to <Link to="/library">My Library</Link>.
+          </p>
+
           <p className="book-detail-desc">{book.description}</p>
-          <span className="price">
-            {book.currency?.toUpperCase()} {book.price}
-          </span>
         </div>
       </div>
 
@@ -74,14 +108,6 @@ export default function BookDetail() {
           ))}
         </ol>
       </div>
-
-      {error && <p className="error">{error}</p>}
-      <button onClick={handleBuy} disabled={buying}>
-        {buying ? "Redirecting to checkout…" : `Buy for ${book.currency?.toUpperCase()} ${book.price}`}
-      </button>
-      <p className="muted" style={{ marginTop: 14 }}>
-        Already own this? Go to <Link to="/library">My Library</Link>.
-      </p>
     </div>
   );
 }
