@@ -13,7 +13,7 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="brand" onClick={closeMenu}>The Reading Room</Link>
+      <Link to="/" className="brand" onClick={closeMenu}>Waheed Books</Link>
 
       <button
         className="nav-toggle"
