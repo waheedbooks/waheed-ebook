@@ -77,7 +77,8 @@ export default function Home() {
                       )}
                     </div>
                     <Link to={`/books/${book._id}`} className="btn-primary book-showcase-buy">
-                      Buy now
+                      <span className="book-showcase-buy-desktop-text">Buy now</span>
+                      <span className="book-showcase-buy-mobile-text">Click for details</span>
                     </Link>
                   </div>
 
