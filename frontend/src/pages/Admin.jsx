@@ -3,7 +3,7 @@ import api from "../api";
 
 export default function Admin() {
   const [books, setBooks] = useState([]);
-  const [form, setForm] = useState({ title: "", author: "", description: "", price: "", currency: "usd" });
+  const [form, setForm] = useState({ title: "", author: "", description: "", price: "", originalPrice: "", currency: "usd" });
   const [file, setFile] = useState(null);
   const [coverImage, setCoverImage] = useState(null);
   const [status, setStatus] = useState("");
@@ -37,7 +37,7 @@ export default function Admin() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setStatus(`Uploaded "${res.data.title}" with ${res.data.chapterCount} chapter(s). Publish it below.`);
-      setForm({ title: "", author: "", description: "", price: "", currency: "usd" });
+      setForm({ title: "", author: "", description: "", price: "", originalPrice: "", currency: "usd" });
       setFile(null);
       setCoverImage(null);
       loadBooks();
@@ -72,6 +72,7 @@ export default function Admin() {
         <input placeholder="Title" value={form.title} onChange={update("title")} required />
         <input placeholder="Author" value={form.author} onChange={update("author")} />
         <textarea placeholder="Description" value={form.description} onChange={update("description")} rows={3} />
+        <input type="number" step="0.01" min="0" placeholder="Original price (optional — shown crossed out)" value={form.originalPrice} onChange={update("originalPrice")} />
         <input type="number" step="0.01" min="0" placeholder="Price" value={form.price} onChange={update("price")} required />
         <select value={form.currency} onChange={update("currency")}>
           <option value="usd">USD</option>
@@ -98,7 +99,14 @@ export default function Admin() {
           {books.map((b) => (
             <tr key={b._id}>
               <td>{b.title}</td>
-              <td>{b.currency?.toUpperCase()} {b.price}</td>
+              <td>
+                {b.originalPrice > b.price && (
+                  <s className="muted" style={{ marginRight: 6 }}>
+                    {b.currency?.toUpperCase()} {b.originalPrice}
+                  </s>
+                )}
+                {b.currency?.toUpperCase()} {b.price}
+              </td>
               <td>{b.chapters?.length ?? 0}</td>
               <td>{b.published ? "Yes" : "No"}</td>
               <td>
