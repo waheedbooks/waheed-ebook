@@ -110,10 +110,11 @@ router.post("/create-checkout-session", protect, async (req, res) => {
 
     const currency = (book.currency || "PKR").toUpperCase();
 
-    const amountInSubunits = Math.round(book.price * 100);
-
+    // Safepay's SDK expects the amount in normal currency units (e.g. 5
+    // for $5), not in subunits/cents like Stripe — sending price * 100
+    // here caused Safepay to charge 100x the book's price.
     const { token } = await safepay.payments.create({
-      amount: amountInSubunits,
+      amount: book.price,
       currency,
     });
 
