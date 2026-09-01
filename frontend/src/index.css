@@ -1,3 +1,8 @@
+/* ============================================================
+   THE READING ROOM — design tokens
+   Palette: ink-green chrome, warm paper, brass accent.
+   Display: Fraunces (serif, literary). UI: Inter. Meta: IBM Plex Mono.
+   ============================================================ */
 :root {
   --ink: #16241f;
   --ink-soft: #223830;
@@ -1199,7 +1204,7 @@ select:focus {
    ABOUT PAGE
    ============================================================ */
 .about-page {
-  max-width: 820px;
+  max-width: 880px;
 }
 .about-head {
   display: flex;
@@ -1222,8 +1227,8 @@ select:focus {
   margin: 0 0 14px;
 }
 .about-lead {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
   line-height: 1.65;
   color: var(--ink);
 }
@@ -1294,6 +1299,57 @@ select:focus {
 }
 .cta-section h2 {
   color: var(--ink);
+}
+
+.degree-list {
+  margin: 16px 0 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.degree-list li {
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: var(--text);
+  padding-left: 4px;
+}
+.degree-list li::marker {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.about-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+.about-gallery-item {
+  margin: 0;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--paper-card);
+}
+.about-gallery-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+  object-fit: contain;
+  background: var(--paper-card);
+  margin: 0 auto;
+}
+.about-gallery-item figcaption {
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+.about-inline-cta {
+  display: inline-block;
+  margin-top: 20px;
 }
 
 @media (max-width: 640px) {
