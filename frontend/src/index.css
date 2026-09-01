@@ -1,3 +1,8 @@
+/* ============================================================
+   THE READING ROOM — design tokens
+   Palette: ink-green chrome, warm paper, brass accent.
+   Display: Fraunces (serif, literary). UI: Inter. Meta: IBM Plex Mono.
+   ============================================================ */
 :root {
   --ink: #16241f;
   --ink-soft: #223830;
@@ -23,9 +28,9 @@
   --shelf-3: #3b4a78; /* indigo */
   --shelf-4: #6b6134; /* olive */
   --shelf-5: #6b3b5e; /* plum */
-  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-display: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  --font-mono: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 * {
