@@ -44,7 +44,7 @@ router.post("/books", uploadBookFields, async (req, res) => {
   let persistedPath;
   let persistedCoverKey;
   try {
-    const { title, author, description, price, currency } = req.body;
+    const { title, author, description, price, originalPrice, currency } = req.body;
     if (!title || price === undefined) {
       return res.status(400).json({ message: "Title and price are required" });
     }
@@ -83,6 +83,7 @@ router.post("/books", uploadBookFields, async (req, res) => {
       author,
       description,
       price: Number(price),
+      originalPrice: originalPrice ? Number(originalPrice) : null,
       currency: currency || "usd",
       chapters: chaptersWithOrder,
       pdfFile,
@@ -108,7 +109,7 @@ router.post("/books", uploadBookFields, async (req, res) => {
 
 router.get("/books", async (req, res) => {
   const books = await Book.find()
-    .select("title author price currency published chapters.title createdAt")
+    .select("title author price originalPrice currency published chapters.title createdAt")
     .sort({ createdAt: -1 });
   res.json(books);
 });
@@ -124,10 +125,10 @@ router.patch("/books/:id/publish", async (req, res) => {
 });
 
 router.patch("/books/:id", async (req, res) => {
-  const { title, author, description, price, currency } = req.body;
+  const { title, author, description, price, originalPrice, currency } = req.body;
   const book = await Book.findByIdAndUpdate(
     req.params.id,
-    { title, author, description, price, currency },
+    { title, author, description, price, originalPrice: originalPrice || null, currency },
     { new: true, runValidators: true }
   );
   if (!book) return res.status(404).json({ message: "Book not found" });
