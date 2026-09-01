@@ -37,22 +37,40 @@ export default function BookList() {
       <div className="shelf-row">
         {books.map((book) => {
           const cover = coverSrc(book);
+          const hasDiscount = book.originalPrice > book.price;
+          const percentOff = hasDiscount
+            ? Math.round(100 - (book.price / book.originalPrice) * 100)
+            : 0;
           return (
             <Link
               to={`/books/${book._id}`}
               key={book._id}
-              className={`book-card ${cover ? "book-card-has-cover" : ""}`}
+              className="book-card"
               style={{ "--shelf-color": shelfColor(book._id) }}
             >
-              {cover && (
-                <img src={cover} alt="" className="book-card-bg" aria-hidden="true" />
-              )}
-              <div className="book-card-inner">
-                <div>
-                  <h3>{book.title}</h3>
-                  {book.author && <p className="muted">by {book.author}</p>}
-                </div>
-                <span className="price">
+              <div className="book-card-cover">
+                {cover ? (
+                  <img src={cover} alt={book.title} />
+                ) : (
+                  <div className="book-card-cover-placeholder">
+                    <span>{book.title?.[0]}</span>
+                  </div>
+                )}
+                {hasDiscount && <span className="book-card-discount-flag">-{percentOff}%</span>}
+              </div>
+
+              <div className="book-card-info">
+                <h3>{book.title}</h3>
+                {book.author && <p className="muted">by {book.author}</p>}
+              </div>
+
+              <div className="book-card-price-tag">
+                {hasDiscount && (
+                  <span className="book-card-price-original">
+                    {book.currency?.toUpperCase()} {book.originalPrice}
+                  </span>
+                )}
+                <span className="book-card-price-current">
                   {book.currency?.toUpperCase()} {book.price}
                 </span>
               </div>
