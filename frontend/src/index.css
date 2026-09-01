@@ -1390,10 +1390,6 @@ select:focus {
   overflow: hidden;
 }
 
-.book-showcase-buy-mobile-text {
-  display: none;
-}
-
 @media (max-width: 640px) {
   .book-showcase-row {
     grid-template-columns: 1fr;
@@ -1401,12 +1397,6 @@ select:focus {
   .book-showcase-cover-col {
     max-width: 100%;
     margin: 0 auto;
-  }
-  .book-showcase-buy-desktop-text {
-    display: none;
-  }
-  .book-showcase-buy-mobile-text {
-    display: inline;
   }
 }
 
