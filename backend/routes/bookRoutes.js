@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const books = await Book.find({ published: true })
-      .select("title author description price currency coverImage createdAt")
+      .select("title author description price originalPrice currency coverImage createdAt")
       .sort({ createdAt: -1 });
     res.json(books);
   } catch (err) {
@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const book = await Book.findOne({ _id: req.params.id, published: true }).select(
-      "title author description price currency coverImage chapters.title chapters.order chapters._id pdfFile"
+      "title author description price originalPrice currency coverImage chapters.title chapters.order chapters._id pdfFile"
     );
     if (!book) return res.status(404).json({ message: "Book not found" });
 
@@ -35,6 +35,7 @@ router.get("/:id", async (req, res) => {
       author: book.author,
       description: book.description,
       price: book.price,
+      originalPrice: book.originalPrice,
       currency: book.currency,
       coverImage: book.coverImage,
       chapters: chapterTitles,
@@ -58,7 +59,7 @@ router.get("/:id/cover", async (req, res) => {
     const contentType = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
 
     res.setHeader("Content-Type", contentType);
-    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.setHeader("Cache-Control", "public, max-age=86400"); // covers rarely change; safe to cache a day
 
     const r2Result = await getObjectStream(`covers/${book.coverImage}`);
     res.setHeader("Content-Length", r2Result.ContentLength);
