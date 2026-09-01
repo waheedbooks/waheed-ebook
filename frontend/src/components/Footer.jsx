@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <span className="brand footer-brand-name">The Reading Room</span>
+          <span className="brand footer-brand-name">Waheed Books</span>
           <p>
             Textbooks by Prof. Dr. Abdul Waheed, Professor of Economics at the
             University of Karachi — read online, no downloads needed.
@@ -36,7 +36,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <span>© {new Date().getFullYear()} The Reading Room. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Waheed Books. All rights reserved.</span>
       </div>
     </footer>
   );
