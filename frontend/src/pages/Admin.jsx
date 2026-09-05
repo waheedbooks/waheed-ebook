@@ -6,8 +6,10 @@ export default function Admin() {
   const [form, setForm] = useState({ title: "", author: "", description: "", price: "", originalPrice: "", currency: "usd" });
   const [file, setFile] = useState(null);
   const [coverImage, setCoverImage] = useState(null);
+  const [previewPdf, setPreviewPdf] = useState(null);
   const [status, setStatus] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [previewUploadingId, setPreviewUploadingId] = useState(null);
 
   function loadBooks() {
     api.get("/admin/books").then((res) => setBooks(res.data));
@@ -32,6 +34,7 @@ export default function Admin() {
       Object.entries(form).forEach(([k, v]) => data.append(k, v));
       data.append("file", file);
       if (coverImage) data.append("coverImage", coverImage);
+      if (previewPdf) data.append("previewPdf", previewPdf);
 
       const res = await api.post("/admin/books", data, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -40,11 +43,30 @@ export default function Admin() {
       setForm({ title: "", author: "", description: "", price: "", originalPrice: "", currency: "usd" });
       setFile(null);
       setCoverImage(null);
+      setPreviewPdf(null);
       loadBooks();
     } catch (err) {
       setStatus(err.response?.data?.message || "Upload failed");
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handlePreviewUpload(bookId, previewFile) {
+    if (!previewFile) return;
+    setPreviewUploadingId(bookId);
+    setStatus("");
+    try {
+      const data = new FormData();
+      data.append("previewPdf", previewFile);
+      await api.post(`/admin/books/${bookId}/preview`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      loadBooks();
+    } catch (err) {
+      setStatus(err.response?.data?.message || "Preview upload failed");
+    } finally {
+      setPreviewUploadingId(null);
     }
   }
 
@@ -84,6 +106,10 @@ export default function Admin() {
           Cover image (optional — shown on the home page)
           <input type="file" accept=".jpg,.jpeg,.png,.webp" onChange={(e) => setCoverImage(e.target.files[0])} />
         </label>
+        <label className="upload-form-label">
+          Preview PDF (optional — contents & preface, free to download from the book page)
+          <input type="file" accept=".pdf" onChange={(e) => setPreviewPdf(e.target.files[0])} />
+        </label>
         <button type="submit" disabled={uploading}>{uploading ? "Uploading…" : "Upload"}</button>
         {status && <p className="notice">{status}</p>}
       </form>
@@ -92,7 +118,7 @@ export default function Admin() {
       <table className="admin-table">
         <thead>
           <tr>
-            <th>Title</th><th>Price</th><th>Chapters</th><th>Published</th><th>Actions</th>
+            <th>Title</th><th>Price</th><th>Chapters</th><th>Published</th><th>Preview</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -109,6 +135,22 @@ export default function Admin() {
               </td>
               <td>{b.chapters?.length ?? 0}</td>
               <td>{b.published ? "Yes" : "No"}</td>
+              <td>
+                <label className="muted" style={{ fontSize: "0.85em", cursor: "pointer" }}>
+                  {previewUploadingId === b._id
+                    ? "Uploading…"
+                    : b.previewPdf
+                    ? "Replace"
+                    : "Add PDF"}
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    style={{ display: "none" }}
+                    disabled={previewUploadingId === b._id}
+                    onChange={(e) => handlePreviewUpload(b._id, e.target.files[0])}
+                  />
+                </label>
+              </td>
               <td>
                 <button onClick={() => togglePublish(b)}>{b.published ? "Unpublish" : "Publish"}</button>
                 <button onClick={() => deleteBook(b)}>Delete</button>
