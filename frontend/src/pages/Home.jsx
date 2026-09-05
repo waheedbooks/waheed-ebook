@@ -26,22 +26,30 @@ export default function Home() {
       <section className="home-hero-v2">
         <div className="home-hero-v2-inner">
           <div className="home-hero-v2-photo">
-            <img src="/images/author-abdul-waheed.jpg" alt="Prof. Dr. Abdul Waheed" />
+            <img
+              src="/images/author-abdul-waheed.jpg"
+              alt="Prof. Dr. Abdul Waheed"
+            />
           </div>
           <div className="home-hero-v2-content">
-            <span className="eyebrow">Prof. Dr. Abdul Waheed · University of Karachi</span>
+            <span className="eyebrow">
+              Prof. Dr. Abdul Waheed · University of Karachi
+            </span>
             <h1>About the author</h1>
             <p>
-              Professor of Economics at the University of Karachi, with a PhD from
-              Nagoya University, Japan, under a Japanese Government Fellowship.
-              Over two decades of university teaching, published research, and
-              hands-on SPSS &amp; EViews work — brought together in these textbooks
-              on statistics and research methods for business and economics
-              students.
+              Professor Dr. Abdul Waheed is an economist with expertise in
+              quantitative data analyses. He earned his PhD degree from Nagoya
+              University, Japan. He has done two post-doctorate researches,
+              published four textbooks, forty-six research articles, and
+              supervised five PhD and twelve MPhil students.
             </p>
             <div className="home-hero-actions">
-              <Link to="/books" className="btn-primary">Browse the books</Link>
-              <Link to="/about" className="btn-ghost">Full profile</Link>
+              <Link to="/books" className="btn-primary">
+                Browse the books
+              </Link>
+              <Link to="/about" className="btn-ghost">
+                Full profile
+              </Link>
             </div>
           </div>
         </div>
@@ -76,14 +84,21 @@ export default function Home() {
                         </div>
                       )}
                     </div>
-                    <Link to={`/books/${book._id}`} className="btn-primary book-showcase-buy">
+                    <Link
+                      to={`/books/${book._id}`}
+                      className="btn-primary book-showcase-buy"
+                    >
                       Click for details
                     </Link>
                   </div>
 
                   <div className="book-showcase-body">
                     <h3>{book.title}</h3>
-                    {book.author && <p className="muted book-showcase-author">by {book.author}</p>}
+                    {book.author && (
+                      <p className="muted book-showcase-author">
+                        by {book.author}
+                      </p>
+                    )}
                     <span className="price">
                       {book.currency?.toUpperCase()} {book.price}
                     </span>
@@ -104,11 +119,13 @@ export default function Home() {
               <span className="eyebrow">Your shelf, anywhere</span>
               <h2>Everything you buy lives in My Library</h2>
               <p>
-                No downloads, no lost files — every book you purchase opens straight
-                in your browser, ready whenever you are.
+                No downloads, no lost files — every book you purchase opens
+                straight in your browser, ready whenever you are.
               </p>
             </div>
-            <Link to="/library" className="btn-primary">Go to my library</Link>
+            <Link to="/library" className="btn-primary">
+              Go to my library
+            </Link>
           </div>
         </section>
       </div>
