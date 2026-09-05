@@ -33,7 +33,7 @@ export default function BookDetail() {
     setError("");
     try {
       const res = await api.post("/payments/create-checkout-session", { bookId: id });
-      window.location.href = res.data.url; // redirect to Stripe Checkout
+      window.location.href = res.data.url;
     } catch (err) {
       setError(err.response?.data?.message || "Could not start checkout");
       setBuying(false);
@@ -89,9 +89,20 @@ export default function BookDetail() {
           </div>
 
           {error && <p className="error">{error}</p>}
-          <button onClick={handleBuy} disabled={buying}>
-            {buying ? "Redirecting to checkout…" : `Buy for ${book.currency?.toUpperCase()} ${book.price}`}
-          </button>
+          <div className="book-detail-actions">
+            <button onClick={handleBuy} disabled={buying}>
+              {buying ? "Redirecting to checkout…" : `Buy for ${book.currency?.toUpperCase()} ${book.price}`}
+            </button>
+            {book.hasPreview && (
+              <a
+                className="preview-download-link"
+                href={`${API_BASE}/books/${book.id}/preview`}
+                download
+              >
+                Download contents &amp; preface (PDF)
+              </a>
+            )}
+          </div>
           <p className="muted" style={{ marginTop: 10 }}>
             Already own this? Go to <Link to="/library">My Library</Link>.
           </p>
