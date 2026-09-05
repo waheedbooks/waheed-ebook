@@ -20,6 +20,7 @@ const bookSchema = new mongoose.Schema(
     coverImage: { type: String, default: "" },
     chapters: [chapterSchema],
     pdfFile: { type: String, default: "" },
+    previewPdf: { type: String, default: "" },
     published: { type: Boolean, default: false },
   },
   { timestamps: true }
