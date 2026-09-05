@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const book = await Book.findOne({ _id: req.params.id, published: true }).select(
-      "title author description price originalPrice currency coverImage chapters.title chapters.order chapters._id pdfFile"
+      "title author description price originalPrice currency coverImage chapters.title chapters.order chapters._id pdfFile previewPdf"
     );
     if (!book) return res.status(404).json({ message: "Book not found" });
 
@@ -40,6 +40,7 @@ router.get("/:id", async (req, res) => {
       coverImage: book.coverImage,
       chapters: chapterTitles,
       hasPdf: Boolean(book.pdfFile),
+      hasPreview: Boolean(book.previewPdf),
     });
   } catch (err) {
     console.error("Get book error:", err);
@@ -67,6 +68,26 @@ router.get("/:id/cover", async (req, res) => {
   } catch (err) {
     console.error("Get cover error:", err);
     res.status(500).end();
+  }
+});
+
+router.get("/:id/preview", async (req, res) => {
+  try {
+    const book = await Book.findOne({ _id: req.params.id, published: true }).select("title previewPdf");
+    if (!book || !book.previewPdf) return res.status(404).json({ message: "No preview is available for this book" });
+
+    const exists = await existsInR2(`previews/${book.previewPdf}`);
+    if (!exists) return res.status(404).json({ message: "This book's preview is missing on the server" });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${book.title} - Preview.pdf"`);
+
+    const r2Result = await getObjectStream(`previews/${book.previewPdf}`);
+    res.setHeader("Content-Length", r2Result.ContentLength);
+    r2Result.Body.pipe(res);
+  } catch (err) {
+    console.error("Get preview error:", err);
+    res.status(500).json({ message: "Could not load preview" });
   }
 });
 
