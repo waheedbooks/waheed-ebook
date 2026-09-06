@@ -263,8 +263,9 @@ a:hover {
    ============================================================ */
 .shelf-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 24px 22px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 230px));
+  justify-content: start;
+  gap: 20px 18px;
   margin-top: 8px;
   padding-bottom: 14px;
   border-bottom: 6px solid var(--paper-card-hi);
@@ -1368,6 +1369,46 @@ select:focus {
 .about-inline-cta {
   display: inline-block;
   margin-top: 20px;
+}
+
+.about-logo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 28px;
+  margin-top: 20px;
+  padding: 20px 24px;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+}
+.about-logo-row img {
+  max-height: 52px;
+  max-width: 150px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.about-gallery--grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.about-gallery--grid .about-gallery-item img {
+  height: 220px;
+  max-height: none;
+  object-fit: cover;
+}
+
+.about-gallery--news {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-auto-rows: min-content;
+  gap: 16px;
+}
+.about-gallery--news .about-gallery-item img {
+  max-height: none;
 }
 
 @media (max-width: 640px) {
