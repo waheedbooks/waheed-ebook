@@ -225,7 +225,7 @@ export default function Admin() {
                     <div className="edit-panel-cover">
                       {b.published ? (
                         <img
-                          src={`${API_BASE}/books/${b._id}/cover`}
+                          src={`${API_BASE}/books/${b._id}/cover?v=${b.coverImage}`}
                           alt={`${b.title} cover`}
                           className="edit-panel-cover-img"
                         />
