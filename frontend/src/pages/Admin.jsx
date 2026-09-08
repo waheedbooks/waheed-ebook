@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import api from "../api";
+
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Admin() {
   const [books, setBooks] = useState([]);
@@ -10,6 +12,10 @@ export default function Admin() {
   const [status, setStatus] = useState("");
   const [uploading, setUploading] = useState(false);
   const [previewUploadingId, setPreviewUploadingId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState(null);
+  const [editCoverFile, setEditCoverFile] = useState(null);
+  const [editSaving, setEditSaving] = useState(false);
 
   function loadBooks() {
     api.get("/admin/books").then((res) => setBooks(res.data));
@@ -70,6 +76,58 @@ export default function Admin() {
     }
   }
 
+  function startEdit(book) {
+    setEditingId(book._id);
+    setEditForm({
+      title: book.title || "",
+      author: book.author || "",
+      description: book.description || "",
+      price: book.price ?? "",
+      originalPrice: book.originalPrice ?? "",
+      currency: book.currency || "usd",
+    });
+    setEditCoverFile(null);
+    setStatus("");
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditForm(null);
+    setEditCoverFile(null);
+  }
+
+  function updateEdit(field) {
+    return (e) => setEditForm({ ...editForm, [field]: e.target.value });
+  }
+
+  async function saveEdit(bookId) {
+    setEditSaving(true);
+    setStatus("");
+    try {
+      await api.patch(`/admin/books/${bookId}`, {
+        title: editForm.title,
+        author: editForm.author,
+        description: editForm.description,
+        price: editForm.price,
+        originalPrice: editForm.originalPrice || null,
+        currency: editForm.currency,
+      });
+      if (editCoverFile) {
+        const data = new FormData();
+        data.append("coverImage", editCoverFile);
+        await api.post(`/admin/books/${bookId}/cover`, data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
+      cancelEdit();
+      loadBooks();
+    } catch (err) {
+      setStatus(err.response?.data?.message || "Update failed");
+    } finally {
+      setEditSaving(false);
+    }
+  }
+
   async function togglePublish(book) {
     await api.patch(`/admin/books/${book._id}/publish`, { published: !book.published });
     loadBooks();
@@ -123,7 +181,8 @@ export default function Admin() {
         </thead>
         <tbody>
           {books.map((b) => (
-            <tr key={b._id}>
+            <Fragment key={b._id}>
+            <tr>
               <td>{b.title}</td>
               <td>
                 {b.originalPrice > b.price && (
@@ -152,10 +211,83 @@ export default function Admin() {
                 </label>
               </td>
               <td>
+                <button onClick={() => (editingId === b._id ? cancelEdit() : startEdit(b))}>
+                  {editingId === b._id ? "Close" : "Edit"}
+                </button>
                 <button onClick={() => togglePublish(b)}>{b.published ? "Unpublish" : "Publish"}</button>
                 <button onClick={() => deleteBook(b)}>Delete</button>
               </td>
             </tr>
+            {editingId === b._id && (
+              <tr className="admin-edit-row">
+                <td colSpan={6}>
+                  <div className="edit-panel">
+                    <div className="edit-panel-cover">
+                      {b.published ? (
+                        <img
+                          src={`${API_BASE}/books/${b._id}/cover`}
+                          alt={`${b.title} cover`}
+                          className="edit-panel-cover-img"
+                        />
+                      ) : (
+                        <div className="edit-panel-cover-placeholder">
+                          Publish the book to preview its cover here
+                        </div>
+                      )}
+                      <label className="muted" style={{ fontSize: "0.85em", cursor: "pointer" }}>
+                        {editCoverFile ? editCoverFile.name : "Replace cover image"}
+                        <input
+                          type="file"
+                          accept=".jpg,.jpeg,.png,.webp"
+                          style={{ display: "none" }}
+                          onChange={(e) => setEditCoverFile(e.target.files[0])}
+                        />
+                      </label>
+                    </div>
+                    <div className="edit-panel-fields">
+                      <input placeholder="Title" value={editForm.title} onChange={updateEdit("title")} />
+                      <input placeholder="Author" value={editForm.author} onChange={updateEdit("author")} />
+                      <textarea
+                        placeholder="Description"
+                        value={editForm.description}
+                        onChange={updateEdit("description")}
+                        rows={3}
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="Original price (optional)"
+                        value={editForm.originalPrice}
+                        onChange={updateEdit("originalPrice")}
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="Price"
+                        value={editForm.price}
+                        onChange={updateEdit("price")}
+                      />
+                      <select value={editForm.currency} onChange={updateEdit("currency")}>
+                        <option value="usd">USD</option>
+                        <option value="gbp">GBP</option>
+                        <option value="eur">EUR</option>
+                      </select>
+                      <div>
+                        <button onClick={() => saveEdit(b._id)} disabled={editSaving}>
+                          {editSaving ? "Saving…" : "Save changes"}
+                        </button>
+                        <button onClick={cancelEdit} disabled={editSaving}>
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            )}
+            </Fragment>
           ))}
         </tbody>
       </table>
