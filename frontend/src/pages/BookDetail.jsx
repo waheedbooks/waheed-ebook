@@ -6,7 +6,7 @@ import { shelfColor } from "../lib/shelfColor";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 function coverSrc(book) {
-  return book.coverImage ? `${API_BASE}/books/${book.id}/cover` : null;
+  return book.coverImage ? `${API_BASE}/books/${book.id}/cover?v=${book.coverImage}` : null;
 }
 
 export default function BookDetail() {
@@ -33,7 +33,7 @@ export default function BookDetail() {
     setError("");
     try {
       const res = await api.post("/payments/create-checkout-session", { bookId: id });
-      window.location.href = res.data.url;
+      window.location.href = res.data.url; // redirect to Stripe Checkout
     } catch (err) {
       setError(err.response?.data?.message || "Could not start checkout");
       setBuying(false);
