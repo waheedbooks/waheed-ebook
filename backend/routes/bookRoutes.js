@@ -60,7 +60,7 @@ router.get("/:id/cover", async (req, res) => {
     const contentType = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
 
     res.setHeader("Content-Type", contentType);
-    res.setHeader("Cache-Control", "public, max-age=86400"); // covers rarely change; safe to cache a day
+    res.setHeader("Cache-Control", "public, max-age=31536000, immutable"); // URL is versioned (?v=<file>), safe to cache indefinitely
 
     const r2Result = await getObjectStream(`covers/${book.coverImage}`);
     res.setHeader("Content-Length", r2Result.ContentLength);
