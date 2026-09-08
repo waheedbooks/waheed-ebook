@@ -708,6 +708,58 @@ select:focus {
   background: var(--paper-card);
 }
 
+.admin-edit-row td {
+  background: var(--paper-card);
+  border-top: none;
+  padding: 16px;
+}
+.edit-panel {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.edit-panel-cover {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 160px;
+  flex-shrink: 0;
+}
+.edit-panel-cover-img {
+  width: 160px;
+  height: 213px;
+  object-fit: cover;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.edit-panel-cover-placeholder {
+  width: 160px;
+  height: 213px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  padding: 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-s);
+  background: #fff;
+}
+.edit-panel-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 240px;
+}
+.edit-panel-fields input,
+.edit-panel-fields textarea,
+.edit-panel-fields select {
+  width: 100%;
+}
+
 /* ============================================================
    PDF READER — full-height embedded viewer for the real book file
    ============================================================ */
