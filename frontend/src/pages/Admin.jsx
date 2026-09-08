@@ -183,8 +183,8 @@ export default function Admin() {
           {books.map((b) => (
             <Fragment key={b._id}>
             <tr>
-              <td>{b.title}</td>
-              <td>
+              <td data-label="Title">{b.title}</td>
+              <td data-label="Price">
                 {b.originalPrice > b.price && (
                   <s className="muted" style={{ marginRight: 6 }}>
                     {b.currency?.toUpperCase()} {b.originalPrice}
@@ -192,9 +192,9 @@ export default function Admin() {
                 )}
                 {b.currency?.toUpperCase()} {b.price}
               </td>
-              <td>{b.chapters?.length ?? 0}</td>
-              <td>{b.published ? "Yes" : "No"}</td>
-              <td>
+              <td data-label="Chapters">{b.chapters?.length ?? 0}</td>
+              <td data-label="Published">{b.published ? "Yes" : "No"}</td>
+              <td data-label="Preview">
                 <label className="muted" style={{ fontSize: "0.85em", cursor: "pointer" }}>
                   {previewUploadingId === b._id
                     ? "Uploading…"
@@ -210,7 +210,7 @@ export default function Admin() {
                   />
                 </label>
               </td>
-              <td>
+              <td data-label="Actions">
                 <button onClick={() => (editingId === b._id ? cancelEdit() : startEdit(b))}>
                   {editingId === b._id ? "Close" : "Edit"}
                 </button>
@@ -220,7 +220,7 @@ export default function Admin() {
             </tr>
             {editingId === b._id && (
               <tr className="admin-edit-row">
-                <td colSpan={6}>
+                <td colSpan={6} className="admin-edit-cell">
                   <div className="edit-panel">
                     <div className="edit-panel-cover">
                       {b.published ? (
