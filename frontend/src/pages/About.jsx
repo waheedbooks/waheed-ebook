@@ -166,7 +166,7 @@ export default function About() {
       <section className="about-section">
         <h2>Academic Positions</h2>
         <p>
-          Dr. Waheed has over three decades of experience in teaching,
+          He has experience of teaching,
           research, and academic leadership. He has experience teaching at the
           University of Karachi (Karachi, Pakistan), University of Bahrain
           (Sakhir, Bahrain), Nagoya University (Nagoya, Japan), Rikkyo
