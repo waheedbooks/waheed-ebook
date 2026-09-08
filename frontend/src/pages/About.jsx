@@ -21,16 +21,36 @@ const BOOKS = [
 ];
 
 const NEWS_IMAGES = [
-  { src: "/images/news-1.jpg", alt: "The Regional Times: Dr. Abdul Waheed hands research book to Japanese envoy" },
-  { src: "/images/news-2.jpg", alt: "Daily Kainaat Karachi coverage of Dr. Abdul Waheed's visit to the Japanese Consulate" },
-  { src: "/images/news-3.jpg", alt: "Department of Economics feature on Dr. Abdul Waheed's fourth authored book" },
-  { src: "/images/news-4.jpg", alt: "Dr. Abdul Waheed presenting his research book to Japan's Ambassador to Pakistan at the Japanese Consulate, Karachi" },
-  { src: "/images/news-5.jpg", alt: "Feature on Dr. Abdul Waheed publishing a trio of books showcasing 30 years of academic excellence" },
-  { src: "/images/news-6.jpg", alt: "A celebration cake marking the publication of Dr. Abdul Waheed's four textbooks" },
+  {
+    src: "/images/news-1.jpg",
+    alt: "The Regional Times: Dr. Abdul Waheed hands research book to Japanese envoy",
+  },
+  {
+    src: "/images/news-2.jpg",
+    alt: "Daily Kainaat Karachi coverage of Dr. Abdul Waheed's visit to the Japanese Consulate",
+  },
+  {
+    src: "/images/news-3.jpg",
+    alt: "Department of Economics feature on Dr. Abdul Waheed's fourth authored book",
+  },
+  {
+    src: "/images/news-4.jpg",
+    alt: "Dr. Abdul Waheed presenting his research book to Japan's Ambassador to Pakistan at the Japanese Consulate, Karachi",
+  },
+  {
+    src: "/images/news-5.jpg",
+    alt: "Feature on Dr. Abdul Waheed publishing a trio of books showcasing 30 years of academic excellence",
+  },
+  {
+    src: "/images/news-6.jpg",
+    alt: "A celebration cake marking the publication of Dr. Abdul Waheed's four textbooks",
+  },
 ];
 
 function AboutGallery({ images, variant }) {
-  const className = variant ? `about-gallery about-gallery--${variant}` : "about-gallery";
+  const className = variant
+    ? `about-gallery about-gallery--${variant}`
+    : "about-gallery";
   return (
     <div className={className}>
       {images.map((img) => (
@@ -65,9 +85,7 @@ export default function About() {
         <div>
           <span className="eyebrow">About the author</span>
           <h1>Prof. Dr. Abdul Waheed</h1>
-          <p className="about-subtitle">
-            Microsoft Certified Educator
-          </p>
+          <p className="about-subtitle">Microsoft Certified Educator</p>
           <a
             href="https://waheedku.com"
             target="_blank"
@@ -92,24 +110,23 @@ export default function About() {
         </p>
         <p className="about-lead">
           Dr. Waheed has had 46 scholarly contributions in peer-reviewed
-          academic journals. Most of his articles are published in impact
-          factor journals indexed in SSCI, Scopus, and ABDC. His short articles
-          have also appeared in Pakistan &amp; Gulf Economist and The News
+          academic journals. Most of his articles are published in impact factor
+          journals indexed in SSCI, Scopus, and ABDC. His short articles have
+          also appeared in Pakistan &amp; Gulf Economist and The News
           International. Dr. Waheed authored four textbooks entitled
-          “Quantitative Research Methods: A Practical Approach”,
-          “Econometrics: Applications with EViews”, “Statistical Analysis in
-          Business and Economics” and “Mathematical Methods in Business and
-          Economics”. He has presented research papers at international
-          conferences held in Japan, Korea, Turkey, Dubai, and Bahrain. Dr.
-          Waheed has also served as a research consultant on various national
-          and international projects. Under his supervision, five students
-          completed their Ph.D. degrees, and twelve completed their MPhil
-          degrees.
+          “Quantitative Research Methods: A Practical Approach”, “Econometrics:
+          Applications with EViews”, “Statistical Analysis in Business and
+          Economics” and “Mathematical Methods in Business and Economics”. He
+          has presented research papers at international conferences held in
+          Japan, Korea, Turkey, Dubai, and Bahrain. Dr. Waheed has also served
+          as a research consultant on various national and international
+          projects. Under his supervision, five students completed their Ph.D.
+          degrees, and twelve completed their MPhil degrees.
         </p>
         <p className="about-lead">
           Dr. Waheed has taught various courses at the graduate and
-          post-graduate levels in different educational institutions such as
-          the University of Karachi (Karachi, Pakistan), University of Bahrain
+          post-graduate levels in different educational institutions such as the
+          University of Karachi (Karachi, Pakistan), University of Bahrain
           (Sakhir, Bahrain), Nagoya University (Nagoya, Japan), Rikkyo
           University (Tokyo, Japan), Institute of Business Administration
           (Karachi, Pakistan), Bahria University (Karachi, Pakistan), Jinnah
@@ -118,7 +135,11 @@ export default function About() {
           Economics at the Department of Economics, Faculty of Arts and Social
           Sciences, and Director, Directorate of Distance Education, at the
           University of Karachi. For more details, please visit his website{" "}
-          <a href="https://www.waheedku.com" target="_blank" rel="noreferrer noopener">
+          <a
+            href="https://www.waheedku.com"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
             www.waheedku.com
           </a>
           .
@@ -128,10 +149,9 @@ export default function About() {
       <section className="about-section">
         <h2>Academic Background</h2>
         <p>
-          Dr. Waheed obtained his PhD from the Graduate School of
-          International Development, Nagoya University, Japan, one of the
-          highly ranked universities in the world. He is also a Microsoft
-          Certified Educator.
+          Dr. Waheed obtained his PhD from the Graduate School of International
+          Development, Nagoya University, Japan, one of the highly ranked
+          universities in the world. He is also a Microsoft Certified Educator.
         </p>
         <ol className="degree-list">
           {DEGREES.map((d) => (
@@ -140,9 +160,18 @@ export default function About() {
         </ol>
         <LogoRow
           logos={[
-            { src: "/images/logo-nagoya-gsid.jpg", alt: "Nagoya University, Graduate School of International Development" },
-            { src: "/images/logo-university-of-karachi.jpg", alt: "University of Karachi" },
-            { src: "/images/logo-aerc.jpg", alt: "Applied Economics Research Centre (AERC), University of Karachi" },
+            {
+              src: "/images/logo-nagoya-gsid.jpg",
+              alt: "Nagoya University, Graduate School of International Development",
+            },
+            {
+              src: "/images/logo-university-of-karachi.jpg",
+              alt: "University of Karachi",
+            },
+            {
+              src: "/images/logo-aerc.jpg",
+              alt: "Applied Economics Research Centre (AERC), University of Karachi",
+            },
           ]}
         />
       </section>
@@ -156,9 +185,18 @@ export default function About() {
         </ol>
         <LogoRow
           logos={[
-            { src: "/images/logo-jsps.jpg", alt: "Japan Society for the Promotion of Science (JSPS)" },
-            { src: "/images/logo-ide-jetro.jpg", alt: "Institute of Developing Economies (IDE-JETRO)" },
-            { src: "/images/logo-mext.jpg", alt: "Japanese Government Monbusho (MEXT)" },
+            {
+              src: "/images/logo-jsps.jpg",
+              alt: "Japan Society for the Promotion of Science (JSPS)",
+            },
+            {
+              src: "/images/logo-ide-jetro.jpg",
+              alt: "Institute of Developing Economies (IDE-JETRO)",
+            },
+            {
+              src: "/images/logo-mext.jpg",
+              alt: "Japanese Government Monbusho (MEXT)",
+            },
           ]}
         />
       </section>
@@ -166,20 +204,25 @@ export default function About() {
       <section className="about-section">
         <h2>Academic Positions</h2>
         <p>
-          He has experience of teaching,
-          research, and academic leadership. He has experience teaching at the
-          University of Karachi (Karachi, Pakistan), University of Bahrain
-          (Sakhir, Bahrain), Nagoya University (Nagoya, Japan), Rikkyo
-          University (Tokyo, Japan), Institute of Business Administration
-          (Karachi, Pakistan), Bahria University (Karachi, Pakistan), Jinnah
-          University for Women (Karachi, Pakistan), and IQRA University
-          (Karachi, Pakistan).
+          He has experience of teaching, research, and academic leadership. He
+          has experience teaching at the University of Karachi (Karachi,
+          Pakistan), University of Bahrain (Sakhir, Bahrain), Nagoya University
+          (Nagoya, Japan), Rikkyo University (Tokyo, Japan), Institute of
+          Business Administration (Karachi, Pakistan), Bahria University
+          (Karachi, Pakistan), Jinnah University for Women (Karachi, Pakistan),
+          and IQRA University (Karachi, Pakistan).
         </p>
         <AboutGallery
           variant="grid"
           images={[
-            { src: "/images/academic-position-1.jpg", alt: "Dr. Abdul Waheed delivering a lecture on econometric models" },
-            { src: "/images/academic-position-2.jpg", alt: "Dr. Abdul Waheed with graduate students and faculty in Japan" },
+            {
+              src: "/images/academic-position-1.jpg",
+              alt: "Dr. Abdul Waheed delivering a lecture on econometric models",
+            },
+            {
+              src: "/images/academic-position-2.jpg",
+              alt: "Dr. Abdul Waheed with graduate students and faculty in Japan",
+            },
           ]}
         />
       </section>
@@ -195,10 +238,11 @@ export default function About() {
           of Distance Education, University of Karachi.
         </p>
         <AboutGallery
-          variant="grid"
           images={[
-            { src: "/images/admin-position-1.jpg", alt: "Dr. Abdul Waheed at his office desk" },
-            { src: "/images/admin-position-2.jpg", alt: "Dr. Abdul Waheed at the University of Karachi's 32nd Annual Convocation" },
+            {
+              src: "/images/admin-position-1.jpg",
+              alt: "Dr. Abdul Waheed at his office desk",
+            },
           ]}
         />
       </section>
@@ -210,12 +254,12 @@ export default function About() {
           mentorship. Over the years, he has supervised numerous Ph.D. and
           M.Phil. theses, contributing significantly to the academic landscape
           in Pakistan. Dr. Waheed has had 46 scholarly contributions in
-          peer-reviewed academic journals, four textbooks, and a monograph.
-          Most of his articles are published in impact factor journals
-          indexed in SSCI, Scopus, and ABDC. His short articles have also
-          appeared in Pakistan &amp; Gulf Economist and The News
-          International. He has presented research papers at international
-          conferences held in Japan, Korea, Turkey, Dubai, and Bahrain.
+          peer-reviewed academic journals, four textbooks, and a monograph. Most
+          of his articles are published in impact factor journals indexed in
+          SSCI, Scopus, and ABDC. His short articles have also appeared in
+          Pakistan &amp; Gulf Economist and The News International. He has
+          presented research papers at international conferences held in Japan,
+          Korea, Turkey, Dubai, and Bahrain.
         </p>
         <AboutGallery
           images={[
@@ -230,8 +274,8 @@ export default function About() {
       <section className="about-section">
         <h2>Authored Books</h2>
         <p>
-          Dr. Waheed authored four (04) textbooks, which are outcomes of his
-          30 years of teaching and research experience. These books have been
+          Dr. Waheed authored four (04) textbooks, which are outcomes of his 30
+          years of teaching and research experience. These books have been
           included in the syllabus and are taught at the university level by
           faculty members:
         </p>
@@ -257,10 +301,9 @@ export default function About() {
         <h2>Books in News</h2>
         <p>
           Dr. Waheed's research and books have been featured in the national
-          press and celebrated at university and departmental events —
-          including presenting his textbooks to Japan's Ambassador to
-          Pakistan and the Consul General of Japan in Karachi at the Japanese
-          Consulate.
+          press and celebrated at university and departmental events — including
+          presenting his textbooks to Japan's Ambassador to Pakistan and the
+          Consul General of Japan in Karachi at the Japanese Consulate.
         </p>
         <AboutGallery variant="news" images={NEWS_IMAGES} />
       </section>
@@ -269,9 +312,9 @@ export default function About() {
         <h2>Read the books</h2>
         <p>
           His textbooks on statistical analysis and quantitative research
-          methods for business and economics are available in full below —
-          built around SPSS and EViews walkthroughs, worked examples, and
-          self-test questions.
+          methods for business and economics are available in full below — built
+          around SPSS and EViews walkthroughs, worked examples, and self-test
+          questions.
         </p>
         <Link to="/books" className="btn-primary">
           Browse the books
