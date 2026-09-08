@@ -311,10 +311,8 @@ export default function About() {
       <section className="about-section cta-section">
         <h2>Read the books</h2>
         <p>
-          His textbooks on statistical analysis and quantitative research
-          methods for business and economics are available in full below — built
-          around SPSS and EViews walkthroughs, worked examples, and self-test
-          questions.
+          All his textbooks are available in ebook format and can be downloaded
+          upon payment of discounted prices.
         </p>
         <Link to="/books" className="btn-primary">
           Browse the books
