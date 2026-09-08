@@ -16,7 +16,7 @@ fs.mkdirSync(TMP_DIR, { recursive: true });
 
 const upload = multer({
   dest: TMP_DIR,
-  limits: { fileSize: 25 * 1024 * 1024 },
+  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB
   fileFilter: (req, file, cb) => {
     if (file.fieldname === "coverImage") {
       const allowedImages = ["image/jpeg", "image/png", "image/webp"];
@@ -44,6 +44,7 @@ const uploadBookFields = upload.fields([
 ]);
 
 const uploadPreviewOnly = upload.fields([{ name: "previewPdf", maxCount: 1 }]);
+const uploadCoverOnly = upload.fields([{ name: "coverImage", maxCount: 1 }]);
 
 router.post("/books", uploadBookFields, async (req, res) => {
   let tempPath;
@@ -132,7 +133,7 @@ router.post("/books", uploadBookFields, async (req, res) => {
 
 router.get("/books", async (req, res) => {
   const books = await Book.find()
-    .select("title author price originalPrice currency published chapters.title createdAt previewPdf")
+    .select("title author description price originalPrice currency published chapters.title createdAt previewPdf coverImage")
     .sort({ createdAt: -1 });
   res.json(books);
 });
@@ -180,7 +181,7 @@ router.post("/books/:id/preview", uploadPreviewOnly, async (req, res) => {
     await book.save();
 
     if (oldPreviewKey) {
-      await deleteFromR2(`previews/${oldPreviewKey}`);
+      await deleteFromR2(`previews/${oldPreviewKey}`); // best-effort cleanup of the replaced file
     }
 
     res.json({ message: "Preview uploaded", previewPdf });
@@ -190,6 +191,44 @@ router.post("/books/:id/preview", uploadPreviewOnly, async (req, res) => {
       await deleteFromR2(`previews/${persistedPreviewKey}`);
     }
     res.status(500).json({ message: err.message || "Failed to upload preview" });
+  } finally {
+    if (tempPath && fs.existsSync(tempPath)) fs.unlink(tempPath, () => {});
+  }
+});
+
+router.post("/books/:id/cover", uploadCoverOnly, async (req, res) => {
+  let tempPath;
+  let persistedCoverKey;
+  try {
+    const coverFile = req.files?.coverImage?.[0];
+    if (!coverFile) {
+      return res.status(400).json({ message: "A .jpg, .png, or .webp file is required" });
+    }
+    tempPath = coverFile.path;
+
+    const book = await Book.findById(req.params.id).select("coverImage");
+    if (!book) return res.status(404).json({ message: "Book not found" });
+
+    const ext = coverFile.mimetype === "image/png" ? "png" : coverFile.mimetype === "image/webp" ? "webp" : "jpg";
+    const coverImage = `${crypto.randomUUID()}.${ext}`;
+    await uploadToR2(tempPath, `covers/${coverImage}`, coverFile.mimetype);
+    persistedCoverKey = coverImage;
+
+    const oldCoverKey = book.coverImage;
+    book.coverImage = coverImage;
+    await book.save();
+
+    if (oldCoverKey) {
+      await deleteFromR2(`covers/${oldCoverKey}`);
+    }
+
+    res.json({ message: "Cover updated", coverImage });
+  } catch (err) {
+    console.error("Upload cover error:", err);
+    if (persistedCoverKey) {
+      await deleteFromR2(`covers/${persistedCoverKey}`);
+    }
+    res.status(500).json({ message: err.message || "Failed to upload cover" });
   } finally {
     if (tempPath && fs.existsSync(tempPath)) fs.unlink(tempPath, () => {});
   }
