@@ -5,7 +5,7 @@ import { shelfColor } from "../lib/shelfColor";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 function coverSrc(book) {
-  return book.coverImage ? `${API_BASE}/books/${book._id}/cover` : null;
+  return book.coverImage ? `${API_BASE}/books/${book._id}/cover?v=${book.coverImage}` : null;
 }
 
 export default function BookList() {
