@@ -9,10 +9,18 @@ async function protect(req, res, next) {
     }
     const token = header.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id).select("+currentSessionId");
     if (!user) {
       return res.status(401).json({ message: "User no longer exists" });
     }
+
+    if (!decoded.sessionId || decoded.sessionId !== user.currentSessionId) {
+      return res.status(401).json({
+        message: "You have been logged out because your account was signed in from another device.",
+        sessionExpired: true,
+      });
+    }
+
     req.user = user;
     next();
   } catch (err) {
