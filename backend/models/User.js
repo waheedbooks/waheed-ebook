@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
     verifyTokenExpires: { type: Date, select: false },
     resetPasswordTokenHash: { type: String, select: false },
     resetPasswordExpires: { type: Date, select: false },
+    currentSessionId: { type: String, select: false },
   },
   { timestamps: true }
 );
