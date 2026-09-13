@@ -7,10 +7,17 @@ const { sendPasswordResetEmail, sendVerificationEmail } = require("../utils/mail
 
 const router = express.Router();
 
-function signToken(user) {
-  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+function signToken(user, sessionId) {
+  return jwt.sign({ id: user._id, role: user.role, sessionId }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
+}
+
+async function startNewSession(user) {
+  const sessionId = crypto.randomBytes(16).toString("hex");
+  user.currentSessionId = sessionId;
+  await user.save();
+  return sessionId;
 }
 
 router.post("/register", async (req, res) => {
@@ -73,7 +80,8 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const token = signToken(user);
+    const sessionId = await startNewSession(user);
+    const token = signToken(user, sessionId);
     res.json({
       token,
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
@@ -81,6 +89,17 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Login failed" });
+  }
+});
+
+router.post("/logout", protect, async (req, res) => {
+  try {
+    req.user.currentSessionId = undefined;
+    await req.user.save();
+    res.json({ message: "Logged out." });
+  } catch (err) {
+    console.error("Logout error:", err);
+    res.status(500).json({ message: "Logout failed" });
   }
 });
 
@@ -167,7 +186,8 @@ router.post("/verify-email/:token", async (req, res) => {
     user.verifyTokenExpires = undefined;
     await user.save();
 
-    const token = signToken(user);
+    const sessionId = await startNewSession(user);
+    const token = signToken(user, sessionId);
     res.json({
       message: "Email verified.",
       token,
