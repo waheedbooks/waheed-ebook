@@ -74,18 +74,26 @@ export default function Library() {
             <Link
               to={`/read/${book._id}`}
               key={book._id}
-              className={`book-card ${cover ? "book-card-has-cover" : ""}`}
+              className="book-card"
               style={{ "--shelf-color": shelfColor(book._id) }}
             >
-              {cover && (
-                <img src={cover} alt="" className="book-card-bg" aria-hidden="true" />
-              )}
-              <div className="book-card-inner">
-                <div>
-                  <h3>{book.title}</h3>
-                  {book.author && <p className="muted">by {book.author}</p>}
-                </div>
-                <span className="read-link">Read now</span>
+              <div className="book-card-cover">
+                {cover ? (
+                  <img src={cover} alt={book.title} />
+                ) : (
+                  <div className="book-card-cover-placeholder">
+                    <span>{book.title?.[0]}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="book-card-info">
+                <h3>{book.title}</h3>
+                {book.author && <p className="muted">by {book.author}</p>}
+              </div>
+
+              <div className="book-card-price-tag">
+                <span className="book-card-price-current">Read now</span>
               </div>
             </Link>
           );
