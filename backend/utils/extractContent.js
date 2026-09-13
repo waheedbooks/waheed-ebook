@@ -29,11 +29,15 @@ const HEADING_START = `(?:chapter|part)\\s+(?:\\d+|${NUMBER_WORDS})|appendix\\s+
 const HEADING_REGEX = new RegExp(`^[ \\t]*(${HEADING_START})\\b.{0,100}`, "gim");
 
 function looksLikeTocLine(line) {
-  return /\.{3,}\s*\d+\s*$/.test(line) || /\.{2,}/.test(line);
+  return (
+    /\.{3,}\s*\d+\s*$/.test(line) ||
+    /\.{2,}/.test(line) ||
+    /[\-–—]{3,}\s*\d*\s*$/.test(line)
+  );
 }
 
-function normalizeKey(headingText) {
-  const head = headingText.toLowerCase().trim().slice(0, 30);
+function normalizeKey(headingOnly) {
+  const head = headingOnly.toLowerCase().trim();
   const isAppendix = head.startsWith("appendix");
   const numberMatch = head.match(/\d+/);
   if (numberMatch) return (isAppendix ? "appendix-" : "chapter-") + numberMatch[0];
@@ -42,6 +46,14 @@ function normalizeKey(headingText) {
   const letterMatch = head.match(/appendix\s+([a-z0-9]+)/);
   if (letterMatch) return "appendix-" + letterMatch[1];
   return head;
+}
+
+function looksLikeRealHeadingLine(rawText, matchIndex) {
+  const lineEnd = rawText.indexOf("\n", matchIndex);
+  const line = lineEnd === -1 ? rawText.slice(matchIndex) : rawText.slice(matchIndex, lineEnd);
+  const rest = line.replace(new RegExp(`^\\s*(?:${HEADING_START})\\b`, "i"), "").trim();
+  if (rest.startsWith("(")) return false;
+  return true;
 }
 
 function formatKeyLabel(key) {
@@ -61,8 +73,10 @@ function extractLineTitle(rawText, matchIndex) {
   const line = lineEnd === -1 ? rawText.slice(matchIndex) : rawText.slice(matchIndex, lineEnd);
   let rest = line.replace(new RegExp(`^\\s*(?:${HEADING_START})\\b`, "i"), "");
   rest = rest.replace(/^[\s:.\-–—]+/, "");
-  rest = rest.replace(/[\s.]*\.{2,}[\s.]*\d+\s*$/, ""); // "..... 19" dot-leader + page number
-  rest = rest.replace(/\s+\d{1,4}\s*$/, ""); // a plain trailing page number, no dots
+  rest = rest.replace(/[\s.]*\.{2,}[\s.]*\d+\s*$/, "");
+  rest = rest.replace(/[\s\-–—]*[\-–—]{2,}[\s\-–—]*\d+\s*$/, "");
+  rest = rest.replace(/\s+\d{1,4}\s*$/, "");
+  rest = rest.replace(/[\s.\-–—]{2,}$/, "");
   rest = collapseWhitespace(rest);
   return rest.length >= 3 ? rest : "";
 }
@@ -71,22 +85,18 @@ function splitIntoChapters(rawText) {
   const allMatches = [...rawText.matchAll(HEADING_REGEX)].map((m) => ({
     index: m.index,
     text: m[0].trim(),
+    heading: m[1].trim(),
   }));
 
   if (allMatches.length === 0) {
     return [{ title: "Full Text", content: rawText.trim() }];
   }
 
-  const withKeys = allMatches.map((m) => ({ ...m, key: normalizeKey(m.text) }));
+  const withKeys = allMatches.map((m) => ({ ...m, key: normalizeKey(m.heading) }));
 
-  const titleMap = new Map();
-  for (const m of withKeys) {
-    const candidate = extractLineTitle(rawText, m.index);
-    const current = titleMap.get(m.key) || "";
-    if (candidate.length > current.length) titleMap.set(m.key, candidate);
-  }
-
-  const candidates = withKeys.filter((m) => !looksLikeTocLine(m.text));
+  const candidates = withKeys.filter(
+    (m) => !looksLikeTocLine(m.text) && looksLikeRealHeadingLine(rawText, m.index)
+  );
   if (candidates.length === 0) {
     return [{ title: "Full Text", content: rawText.trim() }];
   }
@@ -119,7 +129,7 @@ function splitIntoChapters(rawText) {
   canonical.sort((a, b) => a.index - b.index);
   const withContent = canonical.map((m, i) => {
     const end = i + 1 < canonical.length ? canonical[i + 1].index : rawText.length;
-    const descriptiveTitle = titleMap.get(m.key);
+    const descriptiveTitle = extractLineTitle(rawText, m.index);
     const title = descriptiveTitle
       ? `${formatKeyLabel(m.key)}: ${descriptiveTitle}`
       : formatKeyLabel(m.key);
