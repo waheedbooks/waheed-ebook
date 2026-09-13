@@ -68,17 +68,37 @@ function collapseWhitespace(text) {
   return text.replace(/\s+/g, " ").trim();
 }
 
+function stripTrailingPageArtifacts(text) {
+  let rest = text;
+  rest = rest.replace(/[\s.]*\.{2,}[\s.]*\d+\s*$/, "");
+  rest = rest.replace(/[\s\-–—]*[\-–—]{2,}[\s\-–—]*\d+\s*$/, "");
+  rest = rest.replace(/\s+\d{1,4}\s*$/, "");
+  rest = rest.replace(/[\s.\-–—]{2,}$/, "");
+  return collapseWhitespace(rest);
+}
+
 function extractLineTitle(rawText, matchIndex) {
   const lineEnd = rawText.indexOf("\n", matchIndex);
   const line = lineEnd === -1 ? rawText.slice(matchIndex) : rawText.slice(matchIndex, lineEnd);
   let rest = line.replace(new RegExp(`^\\s*(?:${HEADING_START})\\b`, "i"), "");
   rest = rest.replace(/^[\s:.\-–—]+/, "");
-  rest = rest.replace(/[\s.]*\.{2,}[\s.]*\d+\s*$/, "");
-  rest = rest.replace(/[\s\-–—]*[\-–—]{2,}[\s\-–—]*\d+\s*$/, "");
-  rest = rest.replace(/\s+\d{1,4}\s*$/, "");
-  rest = rest.replace(/[\s.\-–—]{2,}$/, "");
-  rest = collapseWhitespace(rest);
-  return rest.length >= 3 ? rest : "";
+  rest = stripTrailingPageArtifacts(rest);
+  if (rest.length >= 3) return rest;
+
+  if (lineEnd === -1) return "";
+  let cursor = lineEnd + 1;
+  for (let i = 0; i < 3 && cursor < rawText.length; i++) {
+    const nextEnd = rawText.indexOf("\n", cursor);
+    const nextLineRaw = nextEnd === -1 ? rawText.slice(cursor) : rawText.slice(cursor, nextEnd);
+    const trimmed = nextLineRaw.trim();
+    cursor = nextEnd === -1 ? rawText.length : nextEnd + 1;
+    if (trimmed === "") continue;
+    if (new RegExp(`^(?:${HEADING_START})\\b`, "i").test(trimmed)) return "";
+    if (looksLikeTocLine(trimmed)) return "";
+    const candidate = stripTrailingPageArtifacts(trimmed.replace(/^[\s:.\-–—]+/, ""));
+    return candidate.length >= 3 ? candidate : "";
+  }
+  return "";
 }
 
 function splitIntoChapters(rawText) {
@@ -124,7 +144,6 @@ function splitIntoChapters(rawText) {
   if (canonical.length === 0) {
     return [{ title: "Full Text", content: rawText.trim() }];
   }
-
 
   canonical.sort((a, b) => a.index - b.index);
   const withContent = canonical.map((m, i) => {
