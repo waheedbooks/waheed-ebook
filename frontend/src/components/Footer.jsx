@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { SITE, PHONE_LINK } from "../siteConfig";
+import "../legal.css";
 
 export default function Footer() {
   return (
@@ -31,6 +33,27 @@ export default function Footer() {
               </a>
             </li>
             <li><Link to="/about">Credentials &amp; research</Link></li>
+          </ul>
+        </div>
+
+        <div className="footer-col">
+          <h4>Support &amp; policies</h4>
+          <ul>
+            <li><Link to="/contact">Contact us</Link></li>
+            <li><Link to="/terms">Terms &amp; Conditions</Link></li>
+            <li><Link to="/privacy">Privacy Policy</Link></li>
+            <li><Link to="/refund-policy">Refund &amp; Return Policy</Link></li>
+            <li><Link to="/shipping-policy">Shipping, Exchange &amp; Cancellation</Link></li>
+            <li>
+              <a href={`mailto:${SITE.email}`} className="footer-contact-line">
+                {SITE.email}
+              </a>
+            </li>
+            <li>
+              <a href={`tel:${PHONE_LINK}`} className="footer-contact-line">
+                {SITE.phone}
+              </a>
+            </li>
           </ul>
         </div>
       </div>
