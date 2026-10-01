@@ -8,7 +8,9 @@ export default function Contact() {
       <section className="legal-section">
         <p>
           Have a question about a book, your account, a payment or a refund? Get in
-          touch with us using the details below.
+          touch with us using the details below. {SITE.name} is a business based in
+          Pakistan. Calling from outside Pakistan? The phone number below is in
+          international format, so you can dial it as shown.
         </p>
 
         <div className="legal-contact-card">
@@ -31,8 +33,8 @@ export default function Contact() {
             </span>
           </div>
           <div className="legal-contact-row">
-            <span className="legal-contact-label">Location</span>
-            <span>{SITE.location}</span>
+            <span className="legal-contact-label">Address</span>
+            <span>{SITE.address}</span>
           </div>
           <div className="legal-contact-row">
             <span className="legal-contact-label">Hours</span>
@@ -55,8 +57,9 @@ export default function Contact() {
             <a href={`tel:${PHONE_LINK}`}>{SITE.phone}</a>. Please include your full
             name, the email address registered on your account, the book title, the
             date of the transaction, and a clear description of the problem. If the
-            complaint is about a payment, please also include your payment reference
-            or a screenshot of the payment confirmation.
+            complaint is about a payment, a book that will not open or incorrect
+            content, please also include your payment reference and screenshots or
+            other proof so we can investigate quickly.
           </li>
           <li>
             <strong>Acknowledgement.</strong> We will acknowledge your complaint
