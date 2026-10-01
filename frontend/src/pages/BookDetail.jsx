@@ -106,6 +106,12 @@ export default function BookDetail() {
           <p className="muted" style={{ marginTop: 10 }}>
             Already own this? Go to <Link to="/library">My Library</Link>.
           </p>
+          <p className="muted" style={{ marginTop: 6 }}>
+            By purchasing you agree to our <Link to="/terms">Terms &amp; Conditions</Link>,{" "}
+            <Link to="/refund-policy">Refund &amp; Return Policy</Link> and{" "}
+            <Link to="/shipping-policy">Shipping, Exchange &amp; Cancellation Policy</Link>.
+            This is a digital product — nothing is shipped.
+          </p>
 
           <p className="book-detail-desc">{book.description}</p>
         </div>
