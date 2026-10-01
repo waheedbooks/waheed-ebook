@@ -16,6 +16,11 @@ import Library from "./pages/Library";
 import Reader from "./pages/Reader";
 import Admin from "./pages/Admin";
 import PaymentVerify from "./pages/PaymentVerify";
+import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import RefundPolicy from "./pages/RefundPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
 import "./index.css";
 
 function AppShell() {
@@ -35,6 +40,11 @@ function AppShell() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/verify-email/:token" element={<VerifyEmail />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
+        <Route path="/shipping-policy" element={<ShippingPolicy />} />
         <Route
           path="/payment/verify"
           element={
