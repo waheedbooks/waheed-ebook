@@ -9,10 +9,10 @@ export default function Terms() {
         <h2>1. Introduction</h2>
         <ol type="a">
           <li>
-            This website is owned and operated by {SITE.owner}, trading as{" "}
-            {SITE.name} (hereinafter and throughout this website referred to as “we”,
-            “us” and “our”). Our registered office and principal place of business is
-            located in {SITE.location}.
+            This website is owned and operated by {SITE.legalName}, a business based in
+            Pakistan (hereinafter and throughout this website referred to as “we”, “us”
+            and “our”). Our legal business name is {SITE.legalName}. Our registered
+            business address and our office address is: {SITE.address}.
           </li>
           <li>
             We offer this website, including all information, tools, products and
