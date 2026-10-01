@@ -39,8 +39,8 @@ export default function RefundPolicy() {
             full amount, as appropriate.
           </li>
           <li>
-            You contact us within 24 hours of purchase and have not opened the book in
-            the reader.
+            You contact us within {SITE.cancellationWindow} of purchase and have not
+            opened the book in the reader.
           </li>
         </ul>
       </section>
@@ -64,11 +64,13 @@ export default function RefundPolicy() {
       </section>
 
       <section className="legal-section">
-        <h2>3. Returns</h2>
+        <h2>3. Returns and exchanges</h2>
         <p>
           Because our books are digital and viewed online, there is no physical item
           to send back. A &quot;return&quot; simply means that we withdraw your access
-          to the book when we approve your refund.
+          to the book when we approve your refund. Exchanges are only offered if you
+          bought the wrong book by mistake or the book has a problem; see our{" "}
+          <Link to="/shipping-policy">Shipping, Exchange &amp; Cancellation Policy</Link>.
         </p>
       </section>
 
@@ -81,8 +83,9 @@ export default function RefundPolicy() {
           </li>
           <li>
             Give your name, your account email, the book title, the date of purchase
-            and the reason for your request. For payment problems, add your payment
-            reference or a screenshot of the payment.
+            and the reason for your request. Please share proper evidence, such as your
+            payment reference or receipt, and screenshots or a screen recording if the
+            book is defective or will not open.
           </li>
           <li>
             We will reply within {SITE.complaintAcknowledge} and tell you whether the
