@@ -32,12 +32,7 @@ export default function Home() {
             <span className="eyebrow">Prof. Dr. Abdul Waheed · University of Karachi</span>
             <h1>About the author</h1>
             <p>
-              Professor of Economics at the University of Karachi, with a PhD from
-              Nagoya University, Japan, under a Japanese Government Fellowship.
-              Over two decades of university teaching, published research, and
-              hands-on SPSS &amp; EViews work — brought together in these textbooks
-              on statistics and research methods for business and economics
-              students.
+Professor Dr. Abdul Waheed is an economist with expertise in quantitative data analyses. He earned his PhD degree from Nagoya University, Japan. He has done two post-doctorate researches, published four textbooks, forty-six research articles, and supervised five PhD and twelve MPhil students.
             </p>
             <div className="home-hero-actions">
               <Link to="/books" className="btn-primary">Browse the books</Link>
