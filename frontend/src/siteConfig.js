@@ -1,7 +1,7 @@
 export const SITE = {
   name: "Waheed Books",
   owner: "Prof. Dr. Abdul Waheed",
-  legalName: "Prof. Dr. Abdul Waheed (trading as Waheed Books)",
+  legalName: "Nouman Waheed (trading as Waheed Books)",
   location: "Karachi, Pakistan",
 
   email: "waheedbooks29@gmail.com",
