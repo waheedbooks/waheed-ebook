@@ -136,8 +136,7 @@ export default function Terms() {
         <h2>6. Prices, Payment and Delivery</h2>
         <ol type="a">
           <li>
-            Prices are shown on each book page in the currency stated there (normally
-            Pakistani Rupees, PKR) and are the amount you pay at checkout. Prices and
+            Prices are shown on each book page in the currency stated there and are the amount you pay at checkout. Prices and
             discounts may change at any time; a change does not affect completed
             orders.
           </li>
