@@ -183,10 +183,6 @@ router.post("/create-checkout-session", protect, async (req, res) => {
       entry_mode: "raw",
       currency,
       amount,
-      metadata: {
-        user_id: String(req.user._id),
-        book_id: String(book._id),
-      },
       include_fees: false,
     });
     const tracker = getTrackerObject(session)?.token;
