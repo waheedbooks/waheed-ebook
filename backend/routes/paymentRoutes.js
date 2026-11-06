@@ -194,7 +194,7 @@ router.post("/create-checkout-session", protect, async (req, res) => {
       throw new Error("Safepay did not return a tracker token");
     }
 
-    const passport = await safepay.auth.passport.create();
+    const passport = await safepay.client.passport.create();
     const tbt = getPassportToken(passport);
     if (!tbt) {
       throw new Error("Safepay did not return an authentication token");
@@ -213,10 +213,10 @@ router.post("/create-checkout-session", protect, async (req, res) => {
       { upsert: true, new: true }
     );
 
-    const checkoutUrl = await safepay.checkouts.payment.create({
+    const checkoutUrl = safepay.checkout.createCheckoutUrl({
       tracker,
       tbt,
-      environment: SAFEPAY_ENV,
+      env: SAFEPAY_ENV,
       source: "hosted",
       redirect_url: `${process.env.API_BASE_URL}/api/payments/verify`,
       cancel_url: `${process.env.CLIENT_URL}/books/${book._id}?purchase=cancelled`,
