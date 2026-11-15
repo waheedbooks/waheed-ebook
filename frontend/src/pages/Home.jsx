@@ -30,7 +30,7 @@ export default function Home() {
           </div>
           <div className="home-hero-v2-content">
             <span className="eyebrow">Prof. Dr. Abdul Waheed · University of Karachi</span>
-            <h1>About the author</h1>
+            <h1>About the Author</h1>
             <p>
 Professor Dr. Abdul Waheed is an economist with expertise in quantitative data analyses. He earned his PhD degree from Nagoya University, Japan. He has done two post-doctorate researches, published four textbooks, forty-six research articles, and supervised five PhD and twelve MPhil students.
             </p>
