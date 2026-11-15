@@ -80,7 +80,7 @@ export default function BookDetail() {
             )}
             <div className="book-detail-price-block">
               <span className="book-detail-price-label">
-                {hasDiscount ? "Discount Price" : "Price"}
+                {hasDiscount ? "Discounted Price" : "Price"}
               </span>
               <span className="book-detail-price-current">
                 {book.currency?.toUpperCase()} {book.price}
