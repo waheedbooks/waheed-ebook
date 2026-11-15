@@ -35,8 +35,8 @@ export default function Home() {
 Professor Dr. Abdul Waheed is an economist with expertise in quantitative data analyses. He earned his PhD degree from Nagoya University, Japan. He has done two post-doctorate researches, published four textbooks, forty-six research articles, and supervised five PhD and twelve MPhil students.
             </p>
             <div className="home-hero-actions">
-              <Link to="/books" className="btn-primary">Browse the books</Link>
-              <Link to="/about" className="btn-ghost">Full profile</Link>
+              <Link to="/books" className="btn-primary">Browse the Books</Link>
+              <Link to="/about" className="btn-ghost">Full Profile</Link>
             </div>
           </div>
         </div>
