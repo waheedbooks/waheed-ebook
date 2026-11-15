@@ -1,7 +1,3 @@
-// Sends email through Brevo's HTTP API (HTTPS, port 443).
-// Render's free tier blocks SMTP ports, so nodemailer cannot be used there.
-// Required env vars: BREVO_API_KEY, SMTP_FROM (a sender verified in Brevo)
-
 async function sendPasswordResetEmail(to, resetUrl) {
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
@@ -38,7 +34,7 @@ async function sendVerificationEmail(to, verifyUrl) {
       accept: "application/json",
     },
     body: JSON.stringify({
-      sender: { name: "The Reading Room", email: process.env.SMTP_FROM },
+      sender: { name: "Waheed Books", email: process.env.SMTP_FROM },
       to: [{ email: to }],
       subject: "Verify your email — The Reading Room",
       htmlContent: `
