@@ -109,7 +109,7 @@ export default function About() {
           Economies, Tokyo, Japan in 2009.
         </p>
         <p className="about-lead">
-          Dr. Waheed has had 46 scholarly contributions in peer-reviewed
+          Dr. Waheed has had 47 scholarly contributions in peer-reviewed
           academic journals. Most of his articles are published in impact factor
           journals indexed in SSCI, Scopus, and ABDC. His short articles have
           also appeared in Pakistan &amp; Gulf Economist and The News
