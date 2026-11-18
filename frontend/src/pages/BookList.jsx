@@ -25,7 +25,7 @@ export default function BookList() {
   if (error) return <p className="state-line error">{error}</p>;
 
   return (
-    <div className="page">
+    <div className="page page-wide">
       <div className="page-hero">
         <span className="eyebrow">Browse the shelf</span>
         <h2>Available books</h2>
