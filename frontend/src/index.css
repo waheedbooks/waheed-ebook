@@ -281,6 +281,36 @@ a:hover {
   background: linear-gradient(to bottom, rgba(22, 36, 31, 0.12), transparent);
 }
 
+/* Wide variant for the books listing: cards grow with the screen */
+.page-wide {
+  max-width: 1360px;
+}
+.page-wide .shelf-row {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 32px 28px;
+}
+.page-wide .book-card h3 {
+  font-size: 1.3rem;
+}
+.page-wide .book-card-info {
+  padding: 18px 20px 0;
+}
+.page-wide .book-card-price-tag {
+  margin: 14px 20px 20px;
+}
+@media (min-width: 1600px) {
+  .page-wide {
+    max-width: 1640px;
+  }
+  .page-wide .shelf-row {
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 40px 34px;
+  }
+  .page-wide .book-card h3 {
+    font-size: 1.45rem;
+  }
+}
+
 .book-card {
   display: flex;
   flex-direction: column;
