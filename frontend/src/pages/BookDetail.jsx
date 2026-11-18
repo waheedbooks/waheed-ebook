@@ -120,9 +120,11 @@ export default function BookDetail() {
       <div className="toc-card">
         <h3>Table of contents</h3>
         <ol>
-          {book.chapters.map((c) => (
-            <li key={c.id}>{c.title}</li>
-          ))}
+          {book.chapters
+            .filter((c) => !/^\s*appendix\b/i.test(c.title))
+            .map((c) => (
+              <li key={c.id}>{c.title}</li>
+            ))}
         </ol>
       </div>
     </div>
