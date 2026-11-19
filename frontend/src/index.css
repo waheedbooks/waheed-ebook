@@ -1570,14 +1570,23 @@ select:focus {
   object-fit: cover;
 }
 
+/* News clippings: masonry columns, each image keeps its own aspect ratio
+   (no stretched cards / empty space under shorter images) */
 .about-gallery--news {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  grid-auto-rows: min-content;
-  gap: 16px;
+  display: block;
+  column-width: 280px;
+  column-gap: 20px;
+}
+.about-gallery--news .about-gallery-item {
+  display: inline-block;
+  width: 100%;
+  margin: 0 0 20px;
+  break-inside: avoid;
+  box-shadow: var(--shadow-card);
 }
 .about-gallery--news .about-gallery-item img {
   max-height: none;
+  height: auto;
 }
 
 @media (max-width: 640px) {
