@@ -123,7 +123,17 @@ export default function BookDetail() {
           {book.chapters
             .filter((c) => !/^\s*appendix\b/i.test(c.title))
             .map((c) => (
-              <li key={c.id}>{c.title}</li>
+              <li key={c.id}>
+                {c.title
+                  .toLowerCase()
+                  .replace(/[a-z][a-z']*/g, (w, i, s) =>
+                    i === 0 ||
+                    /:\s*$/.test(s.slice(0, i)) ||
+                    !["a", "an", "and", "as", "at", "by", "for", "in", "of", "on", "or", "the", "to", "with"].includes(w)
+                      ? w[0].toUpperCase() + w.slice(1)
+                      : w
+                  )}
+              </li>
             ))}
         </ol>
       </div>
