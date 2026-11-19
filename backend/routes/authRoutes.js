@@ -30,15 +30,38 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
-    const existing = await User.findOne({ email: email.toLowerCase() });
-    if (existing) {
+    const existing = await User.findOne({ email: email.toLowerCase() }).select(
+      "+verifyTokenExpires"
+    );
+    if (existing && existing.isVerified) {
       return res.status(409).json({ message: "An account with this email already exists" });
+    }
+
+    // An unverified account is not usable yet, so registering again with the same email
+    // simply restarts sign-up (new details + fresh link) instead of blocking the person.
+    // Cooldown: if a link was sent less than 60s ago, don't send another.
+    if (
+      existing &&
+      existing.verifyTokenExpires &&
+      existing.verifyTokenExpires.getTime() - 24 * 60 * 60 * 1000 + 60 * 1000 > Date.now()
+    ) {
+      return res.status(429).json({
+        message: "A verification email was just sent. Please wait a minute and try again.",
+      });
     }
 
     const role =
       adminCode && adminCode === process.env.ADMIN_SIGNUP_CODE ? "admin" : "student";
 
-    const user = await User.create({ name, email, password, role, isVerified: false });
+    let user;
+    if (existing) {
+      existing.name = name;
+      existing.password = password;
+      existing.role = role;
+      user = existing;
+    } else {
+      user = await User.create({ name, email, password, role, isVerified: false });
+    }
 
     const rawToken = crypto.randomBytes(32).toString("hex");
     user.verifyTokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
@@ -158,6 +181,8 @@ router.post("/reset-password/:token", async (req, res) => {
     }
 
     user.password = password;
+    // They just proved they own this inbox, so an unverified account is verified too.
+    user.isVerified = true;
     user.resetPasswordTokenHash = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
@@ -204,9 +229,16 @@ router.post("/resend-verification", async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: "Email is required" });
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ email: email.toLowerCase() }).select("+verifyTokenExpires");
 
-    if (user && !user.isVerified) {
+    // Cooldown: skip if a link was sent less than 60s ago (stops inbox spamming).
+    // The response stays generic so it doesn't reveal whether the account exists.
+    const sentRecently =
+      user &&
+      user.verifyTokenExpires &&
+      user.verifyTokenExpires.getTime() - 24 * 60 * 60 * 1000 + 60 * 1000 > Date.now();
+
+    if (user && !user.isVerified && !sentRecently) {
       const rawToken = crypto.randomBytes(32).toString("hex");
       user.verifyTokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
       user.verifyTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
