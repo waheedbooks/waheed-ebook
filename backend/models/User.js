@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+userSchema.index(
+  { verifyTokenExpires: 1 },
+  { expireAfterSeconds: 7 * 24 * 60 * 60, partialFilterExpression: { isVerified: false } }
+);
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
