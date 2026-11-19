@@ -44,6 +44,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Sticky footer: app fills the screen, page content takes the spare space,
+   so the footer stays at the bottom even on short pages */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.app-main {
+  flex: 1 0 auto;
+}
+
 h1,
 h2,
 h3,
