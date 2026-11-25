@@ -60,6 +60,18 @@ export default function Footer() {
 
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} Waheed Books. All rights reserved.</span>
+        <span className="footer-bottom-divider" aria-hidden="true"></span>
+        <span>
+          A website designed by{" "}
+          <a
+            className="footer-credit"
+            href="https://www.linkedin.com/in/anas-shahnawaz-3b7894217"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            Anas Shahnawaz
+          </a>
+        </span>
       </div>
     </footer>
   );
