@@ -1899,6 +1899,30 @@ select:focus {
   text-align: center;
   font-size: 0.8rem;
   font-family: var(--font-mono);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 16px;
+}
+.footer-bottom-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(244, 239, 225, 0.35);
+}
+.footer-credit {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+.footer-credit:hover {
+  opacity: 0.8;
+}
+@media (max-width: 640px) {
+  .footer-bottom-divider {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {
