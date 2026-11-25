@@ -62,7 +62,7 @@ export default function Footer() {
         <span>© {new Date().getFullYear()} Waheed Books. All rights reserved.</span>
         <span className="footer-bottom-divider" aria-hidden="true"></span>
         <span>
-          A website designed by{" "}
+          Designed and developed by{" "}
           <a
             className="footer-credit"
             href="https://www.linkedin.com/in/anas-shahnawaz-3b7894217"
