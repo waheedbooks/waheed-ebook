@@ -1917,7 +1917,7 @@ select:focus {
   border-bottom: 1px solid currentColor;
 }
 .footer-credit:hover {
-  opacity: 0.8;
+  color: var(--brass-light);
 }
 @media (max-width: 640px) {
   .footer-bottom-divider {
