@@ -4,9 +4,9 @@ export const SITE = {
   legalName: "Nouman Waheed Photogrpahy (trading as Waheed Books)",
   location: "Karachi, Pakistan",
 
-  email: "waheedbooks29@gmail.com",
-  phone: "+92 335 5588849",
-  address: "Shop No 3, B-24 Near Sir Syed University, Block 5 Gulshan e Iqbal, Besides Tawakal Optics, Karachi, Pakistan",
+  email: "waheedku@yahoo.com",
+  phone: "+92-331-0219831",
+  address: "Shop No 3, B-24 Near Sir Syed University, Block 5 Gulshan e Iqbal, Karachi, Pakistan",
   supportHours: "Monday to Friday, 10:00 AM – 5:00 PM (Pakistan Standard Time)",
 
   refundTurnaround: "7 working days",
