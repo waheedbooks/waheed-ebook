@@ -1,18 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
-const SHOW_FOR_MS = 4500; // how long the popup stays before it closes by itself
-const EXIT_MS = 300; // length of the closing animation
+const SHOW_FOR_MS = 4500;
+const EXIT_MS = 300;
 
-// The "you're logged in" popup. Appears after a successful login, closes by itself,
-// pauses while the mouse is over it, and can be closed with the X button or the Esc key.
 export default function LoginToast() {
   const { welcome, dismissWelcome } = useAuth();
   const [leaving, setLeaving] = useState(false);
   const [paused, setPaused] = useState(false);
   const remainingRef = useRef(SHOW_FOR_MS);
 
-  // a new login: start the countdown again
   useEffect(() => {
     if (!welcome) return;
     remainingRef.current = SHOW_FOR_MS;
@@ -20,7 +17,6 @@ export default function LoginToast() {
     setPaused(false);
   }, [welcome]);
 
-  // countdown (stops while paused, and carries on with the time that is left)
   useEffect(() => {
     if (!welcome || paused || leaving) return undefined;
     const startedAt = Date.now();
@@ -31,14 +27,12 @@ export default function LoginToast() {
     };
   }, [welcome, paused, leaving]);
 
-  // after the closing animation, remove it completely
   useEffect(() => {
     if (!leaving) return undefined;
     const timer = setTimeout(dismissWelcome, EXIT_MS);
     return () => clearTimeout(timer);
   }, [leaving, dismissWelcome]);
 
-  // Esc closes it
   useEffect(() => {
     if (!welcome) return undefined;
     const onKey = (e) => {
