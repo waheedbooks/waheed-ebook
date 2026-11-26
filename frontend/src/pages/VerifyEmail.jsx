@@ -17,7 +17,7 @@ export default function VerifyEmail() {
       .post(`/auth/verify-email/${token}`)
       .then((res) => {
         login(res.data.token, res.data.user);
-        showWelcome(res.data.user?.name, true); // first time in: the email link logs them in
+        showWelcome(res.data.user?.name, true);
         setStatus("done");
         setTimeout(() => navigate("/"), 1500);
       })
