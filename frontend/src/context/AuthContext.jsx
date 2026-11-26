@@ -11,8 +11,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [welcome, setWelcome] = useState(null);
 
-  const showWelcome = useCallback((name) => {
-    setWelcome({ id: Date.now(), name: name || "" });
+  const showWelcome = useCallback((name, isNew = false) => {
+    setWelcome({ id: Date.now(), name: name || "", isNew });
   }, []);
   const dismissWelcome = useCallback(() => setWelcome(null), []);
 
