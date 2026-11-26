@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import LoginToast from "./components/LoginToast";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import BookList from "./pages/BookList";
@@ -87,6 +88,7 @@ function AppShell() {
       </Routes>
       </main>
       {!isReader && <Footer />}
+      <LoginToast />
     </>
   );
 }
