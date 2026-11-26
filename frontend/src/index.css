@@ -220,6 +220,16 @@ a:hover {
     width: 100%;
     margin-top: 6px;
   }
+  /* the logo and the menu button sit side by side on one row (the rules above are for the menu links) */
+  .navbar .brand {
+    width: auto;
+    padding: 0;
+    border-bottom: none;
+  }
+  .navbar .nav-toggle {
+    width: 34px;
+    margin: 0;
+  }
 }
 
 /* ============================================================
@@ -891,7 +901,9 @@ select:focus {
 .pdf-reader {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 61px); /* 61px = navbar height */
+  /* --nav-h is the real navbar height, set by Reader.jsx; dvh = the visible screen on phones */
+  height: calc(100vh - var(--nav-h, 61px));
+  height: calc(100dvh - var(--nav-h, 61px));
 }
 .pdf-reader-bar {
   flex-shrink: 0;
@@ -909,7 +921,8 @@ select:focus {
   color: var(--brass-light);
 }
 .pdf-reader-frame {
-  flex: 1 0 auto;
+  flex: 1 1 0;
+  min-height: 0;
   position: relative;
   background: #525659; /* matches the grey a native PDF viewer sits on */
   overflow: hidden;
@@ -924,9 +937,10 @@ select:focus {
 }
 
 .canvas-pdf-viewer {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 .canvas-pdf-toolbar {
   flex-shrink: 0;
@@ -981,36 +995,35 @@ select:focus {
 }
 
 .canvas-pdf-scroll {
-  flex: 1 0 auto;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+  /* A real, fixed-height scroll area: only the pages near the screen get drawn */
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 28px 16px 70px;
-  scroll-behavior: smooth;
   outline: none;
 }
 .canvas-pdf-page {
   position: relative;
+  flex: none;
+  margin: 0 auto 20px;
   background: #fff;
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.04);
-  max-width: 100%;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
   border-radius: 2px;
   overflow: hidden;
+  contain: layout paint;
 }
+/* Pages that are off-screen get a plain, static placeholder (no animation = light on phones) */
 .canvas-pdf-page-placeholder {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
+  background: #f3f3f3;
+}
+.canvas-pdf-page-placeholder.is-loading {
   background: linear-gradient(100deg, #f3f3f3 30%, #fafafa 45%, #f3f3f3 60%);
   background-size: 200% 100%;
   animation: pdf-shimmer 1.4s ease-in-out infinite;
-}
-.canvas-pdf-page-placeholder--over {
-  position: absolute;
-  inset: 0;
 }
 @keyframes pdf-shimmer {
   0% {
@@ -1022,6 +1035,8 @@ select:focus {
 }
 .canvas-pdf-canvas {
   display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   user-select: none;
@@ -1051,6 +1066,7 @@ select:focus {
 .reader-layout {
   display: flex;
   min-height: calc(100vh - 61px);
+  min-height: calc(100dvh - 61px);
 }
 .reader-sidebar {
   width: 260px;
@@ -1114,32 +1130,8 @@ select:focus {
   -webkit-user-select: none;
 }
 
-.watermarked {
-  position: relative;
-  overflow: hidden;
-}
-.watermark-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: space-between;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.1;
-  transform: rotate(-20deg) scale(1.3);
-}
-.watermark-overlay span {
-  display: inline-block;
-  width: 50%;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  white-space: nowrap;
-  color: var(--ink);
-}
 .chapter-text {
   position: relative;
-  z-index: 2;
   line-height: 1.75;
   font-size: 1.05rem;
   color: var(--text);
