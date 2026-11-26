@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
     resetPasswordTokenHash: { type: String, select: false },
     resetPasswordExpires: { type: Date, select: false },
     currentSessionId: { type: String, select: false },
+    loginPinHash: { type: String, select: false },
+    loginPinExpires: { type: Date, select: false },
+    loginPinAttempts: { type: Number, default: 0, select: false },
+    loginPinSentAt: { type: Date, select: false },
   },
   { timestamps: true }
 );
