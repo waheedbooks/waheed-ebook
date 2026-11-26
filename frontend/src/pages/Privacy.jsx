@@ -78,10 +78,6 @@ export default function Privacy() {
           </li>
           <li>Improve content and website layout.</li>
           <li>Resolve disputes that may arise.</li>
-          <li>
-            Show your name and email address as a watermark on book pages to help
-            protect the books from unauthorised sharing.
-          </li>
         </ol>
         <p>We do not sell your Personal Data.</p>
       </section>
