@@ -1,12 +1,11 @@
-import { useEffect, useState, useCallback } from "react";
+import { lazy, Suspense, useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../api";
-import { useAuth } from "../context/AuthContext";
-import CanvasPdfViewer from "../components/CanvasPdfViewer";
+
+const CanvasPdfViewer = lazy(() => import("../components/CanvasPdfViewer"));
 
 export default function Reader() {
   const { id } = useParams();
-  const { user } = useAuth();
   const [book, setBook] = useState(null);
   const [error, setError] = useState("");
   const [forbidden, setForbidden] = useState(false);
@@ -74,6 +73,23 @@ export default function Reader() {
       .finally(() => setLoadingChapter(false));
   }, [id, activeChapterId, book?.hasPdf]);
 
+  // The PDF reader fills exactly the screen below the navbar. The navbar is taller on phones,
+  // so measure it instead of guessing (CSS uses --nav-h).
+  useEffect(() => {
+    const nav = document.querySelector(".navbar");
+    if (!nav) return undefined;
+    const root = document.documentElement;
+    const setHeight = () => root.style.setProperty("--nav-h", `${nav.getBoundingClientRect().height}px`);
+    setHeight();
+    if (typeof ResizeObserver === "undefined") return () => root.style.removeProperty("--nav-h");
+    const observer = new ResizeObserver(setHeight);
+    observer.observe(nav);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--nav-h");
+    };
+  }, []);
+
   const blockCopy = useCallback((e) => e.preventDefault(), []);
   const blockKeys = useCallback((e) => {
     const key = e.key?.toLowerCase();
@@ -126,11 +142,9 @@ export default function Reader() {
           {checkingAccess && <p className="state-line">Loading book…</p>}
           {!checkingAccess && error && <p className="state-line error">{error}</p>}
           {!checkingAccess && !error && accessGranted && (
-            <CanvasPdfViewer
-              fileUrl={fileUrl}
-              authToken={token}
-              watermarkLines={[user?.name, user?.email].filter(Boolean)}
-            />
+            <Suspense fallback={<p className="state-line">Loading book…</p>}>
+              <CanvasPdfViewer fileUrl={fileUrl} authToken={token} />
+            </Suspense>
           )}
         </div>
       </div>
@@ -174,14 +188,7 @@ export default function Reader() {
           <p className="muted">Select a chapter from the left to start reading.</p>
         )}
         {hasChapters && !loadingChapter && chapter && (
-          <div className="watermarked">
-            <div className="watermark-overlay" aria-hidden="true">
-              {Array.from({ length: 30 }).map((_, i) => (
-                <span key={i}>
-                  {chapter.viewer?.name || ""} · {chapter.viewer?.email || ""}
-                </span>
-              ))}
-            </div>
+          <div>
             <h2>{chapter.title}</h2>
             <div className="chapter-text">
               {(chapter.content || "").split("\n").map((para, i) => (
