@@ -8,12 +8,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+function isLoginAttempt(url = "") {
+  return url.startsWith("/auth/login") || url.startsWith("/auth/verify-login-pin");
+}
+
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    if (err.response?.status === 401 && !isLoginAttempt(err.config?.url)) {
+      const hadToken = !!localStorage.getItem("token");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      if (hadToken) {
+        const data = err.response.data || {};
+        window.dispatchEvent(
+          new CustomEvent("auth:session-ended", {
+            detail: { message: data.sessionExpired ? data.message : "" },
+          })
+        );
+      }
     }
     return Promise.reject(err);
   }
