@@ -11,7 +11,7 @@ export default function Login() {
   const [needsVerification, setNeedsVerification] = useState(false);
   const [resendStatus, setResendStatus] = useState("idle");
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, showWelcome } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -23,6 +23,7 @@ export default function Login() {
     try {
       const res = await api.post("/auth/login", { email, password });
       login(res.data.token, res.data.user);
+      showWelcome(res.data.user?.name);
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
