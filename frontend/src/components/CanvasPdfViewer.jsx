@@ -1,119 +1,119 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import * as pdfjsLib from "pdfjs-dist";
-import pdfjsWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import { memo, useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+import pdfjsWorkerUrl from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
-function CanvasPdfPage({ pdf, pageNum, scale, watermarkLines, scrollRoot }) {
-  const wrapRef = useRef(null);
+const CanvasPdfPage = memo(function CanvasPdfPage({
+  pdf,
+  pageNum,
+  width,
+  defaultAspect,
+  isVisible,
+  epoch,
+}) {
   const canvasRef = useRef(null);
-  const [visible, setVisible] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [aspect, setAspect] = useState(0.773);
+  const [measuredAspect, setMeasuredAspect] = useState(null);
+  const aspect = measuredAspect || defaultAspect;
 
   useEffect(() => {
-    const el = wrapRef.current;
-    const root = scrollRoot?.current;
-    if (!el || !root) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          setVisible(entry.isIntersecting);
-        });
-      },
-      { root, rootMargin: "900px 0px", threshold: 0.01 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [scrollRoot]);
+    if (!isVisible || !pdf) return undefined;
+    const canvas = canvasRef.current;
+    if (!canvas) return undefined;
 
-  useEffect(() => {
-    if (!visible || !pdf) return;
     let cancelled = false;
+    let renderTask = null;
+    let page = null;
     setLoaded(false);
 
     (async () => {
-      const page = await pdf.getPage(pageNum);
-      if (cancelled) return;
-      const viewport = page.getViewport({ scale });
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      setAspect(viewport.width / viewport.height);
-
-      const outputScale = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.floor(viewport.width * outputScale);
-      canvas.height = Math.floor(viewport.height * outputScale);
-
-      const context = canvas.getContext("2d");
-      const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-
       try {
-        await page.render({ canvasContext: context, viewport, transform }).promise;
-      } catch (err) {
-        if (err?.name !== "RenderingCancelledException") console.error(err);
-        return;
-      }
-      if (cancelled) return;
+        page = await pdf.getPage(pageNum);
+        if (cancelled) return;
 
-      if (watermarkLines?.length) {
-        context.save();
-        context.globalAlpha = 0.1;
-        context.fillStyle = "#1a1a1a";
-        context.font = `${16 * outputScale}px sans-serif`;
-        context.translate(canvas.width / 2, canvas.height / 2);
-        context.rotate(-Math.PI / 6);
-        const text = watermarkLines.join("   ·   ");
-        for (let y = -canvas.height; y < canvas.height; y += 90 * outputScale) {
-          for (let x = -canvas.width; x < canvas.width; x += 340 * outputScale) {
-            context.fillText(text, x, y);
-          }
+        const base = page.getViewport({ scale: 1 });
+        setMeasuredAspect(base.width / base.height);
+        const viewport = page.getViewport({ scale: width / base.width });
+
+        const isTouchDevice = !!window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+        const maxPixels = isTouchDevice ? 3000000 : 8000000;
+        let outputScale = Math.min(window.devicePixelRatio || 1, 2);
+        const wantedPixels = viewport.width * viewport.height * outputScale * outputScale;
+        if (wantedPixels > maxPixels) {
+          outputScale = Math.max(1, outputScale * Math.sqrt(maxPixels / wantedPixels));
         }
-        context.restore();
-      }
 
-      setLoaded(true);
+        canvas.width = Math.floor(viewport.width * outputScale);
+        canvas.height = Math.floor(viewport.height * outputScale);
+
+        const context = canvas.getContext("2d", { alpha: false });
+        const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+
+        renderTask = page.render({ canvasContext: context, viewport, transform });
+        await renderTask.promise;
+        if (!cancelled) setLoaded(true);
+      } catch (err) {
+        if (err?.name !== "RenderingCancelledException" && !cancelled) {
+          console.error("PDF page render failed:", err);
+        }
+      }
     })();
 
     return () => {
       cancelled = true;
+      if (renderTask) renderTask.cancel();
+      if (page) page.cleanup();
+      canvas.width = 0;
+      canvas.height = 0;
+      setLoaded(false);
     };
-  }, [visible, pdf, pageNum, scale, watermarkLines]);
+  }, [isVisible, pdf, pageNum, width, epoch]);
 
   return (
     <div
-      ref={wrapRef}
       data-page-num={pageNum}
       className="canvas-pdf-page"
-      style={{ width: Math.round(560 * scale), aspectRatio: aspect }}
+      style={{ width, height: Math.round(width / aspect) }}
     >
-      {visible ? (
+      {isVisible && (
         <canvas
           ref={canvasRef}
           className={`canvas-pdf-canvas no-select${loaded ? " is-loaded" : ""}`}
         />
-      ) : (
-        <div className="canvas-pdf-page-placeholder" />
       )}
-      {!loaded && <div className="canvas-pdf-page-placeholder canvas-pdf-page-placeholder--over" />}
+      {(!isVisible || !loaded) && (
+        <div
+          className={`canvas-pdf-page-placeholder${isVisible ? " is-loading" : ""}`}
+        />
+      )}
       <span className="canvas-pdf-page-badge">{pageNum}</span>
     </div>
   );
-}
+});
 
-export default function CanvasPdfViewer({ fileUrl, authToken, watermarkLines }) {
+export default function CanvasPdfViewer({ fileUrl, authToken }) {
   const [pdf, setPdf] = useState(null);
   const [numPages, setNumPages] = useState(0);
-  const [scale, setScale] = useState(1.3);
+  const [defaultAspect, setDefaultAspect] = useState(0.773);
+  const [scale, setScale] = useState(() => (window.innerWidth < 720 ? 1 : 1.3));
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [visiblePages, setVisiblePages] = useState(() => new Set([1]));
+  const [epoch, setEpoch] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageInput, setPageInput] = useState("1");
+
   const scrollRef = useRef(null);
+  const visibleRef = useRef(new Set([1]));
   const zoomDebounceRef = useRef(null);
+  const scrollRatioRef = useRef(0);
+  const rafRef = useRef(0);
 
   useEffect(() => {
-    if (!fileUrl) return;
+    if (!fileUrl) return undefined;
     let cancelled = false;
     setLoading(true);
     setError("");
@@ -121,67 +121,156 @@ export default function CanvasPdfViewer({ fileUrl, authToken, watermarkLines }) 
     const loadingTask = pdfjsLib.getDocument({
       url: fileUrl,
       httpHeaders: authToken ? { Authorization: `Bearer ${authToken}` } : undefined,
+      disableStream: true,
+      disableAutoFetch: true,
+      rangeChunkSize: 524288,
+      isEvalSupported: false,
     });
 
-    loadingTask.promise
-      .then((doc) => {
+    (async () => {
+      try {
+        const doc = await loadingTask.promise;
+        if (cancelled) return;
+        try {
+          const first = await doc.getPage(1);
+          const v = first.getViewport({ scale: 1 });
+          if (!cancelled) setDefaultAspect(v.width / v.height);
+        } catch {
+        }
         if (cancelled) return;
         setPdf(doc);
         setNumPages(doc.numPages);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Failed to load PDF:", err);
         if (!cancelled) setError("Could not load this book's file.");
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    })();
 
     return () => {
       cancelled = true;
       loadingTask.destroy?.();
     };
-  }, [fileUrl, authToken]);
+  }, [fileUrl, authToken, reloadKey]);
 
   useEffect(() => {
-    return () => {
-      pdf?.destroy?.();
+    const root = scrollRef.current;
+    if (!root) return undefined;
+    setContainerWidth(Math.floor(root.clientWidth - 32));
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver((entries) => {
+      const w = Math.floor(entries[0].contentRect.width);
+      if (w > 0) setContainerWidth(w);
+    });
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [loading, error]);
+
+  useEffect(() => {
+    const root = scrollRef.current;
+    if (!root || !numPages) return undefined;
+
+    if (typeof IntersectionObserver === "undefined") {
+      const firstPages = new Set([1, 2, 3]);
+      visibleRef.current = firstPages;
+      setVisiblePages(firstPages);
+      return undefined;
+    }
+
+    const set = new Set();
+    visibleRef.current = set;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let changed = false;
+        entries.forEach((entry) => {
+          const n = Number(entry.target.dataset.pageNum);
+          if (entry.isIntersecting) {
+            if (!set.has(n)) {
+              set.add(n);
+              changed = true;
+            }
+          } else if (set.delete(n)) {
+            changed = true;
+          }
+        });
+        if (changed) setVisiblePages(new Set(set));
+      },
+      { root, rootMargin: "80% 0px", threshold: 0 }
+    );
+    root.querySelectorAll("[data-page-num]").forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [numPages, loading, error]);
+
+  useEffect(() => {
+    const onReturn = () => {
+      if (document.visibilityState === "visible") setEpoch((e) => e + 1);
     };
-  }, [pdf]);
+    document.addEventListener("visibilitychange", onReturn);
+    window.addEventListener("pageshow", onReturn);
+    return () => {
+      document.removeEventListener("visibilitychange", onReturn);
+      window.removeEventListener("pageshow", onReturn);
+    };
+  }, []);
 
   useEffect(() => {
     setPageInput(String(currentPage));
   }, [currentPage]);
 
-  const setScaleDebounced = useCallback((updater) => {
-    clearTimeout(zoomDebounceRef.current);
-    zoomDebounceRef.current = setTimeout(() => setScale(updater), 90);
+  useEffect(() => {
+    return () => {
+      clearTimeout(zoomDebounceRef.current);
+      cancelAnimationFrame(rafRef.current);
+    };
   }, []);
-  const zoomOut = () => setScaleDebounced((s) => Math.max(0.6, +(s - 0.2).toFixed(1)));
-  const zoomIn = () => setScaleDebounced((s) => Math.min(2.6, +(s + 0.2).toFixed(1)));
+
+  const changeZoom = (delta) => {
+    const root = scrollRef.current;
+    if (root) scrollRatioRef.current = root.scrollTop / Math.max(1, root.scrollHeight);
+    clearTimeout(zoomDebounceRef.current);
+    zoomDebounceRef.current = setTimeout(
+      () => setScale((s) => Math.min(2.6, Math.max(0.6, +(s + delta).toFixed(1)))),
+      90
+    );
+  };
+
+  useLayoutEffect(() => {
+    const root = scrollRef.current;
+    if (!root || !scrollRatioRef.current) return;
+    root.scrollTop = scrollRatioRef.current * root.scrollHeight;
+    scrollRatioRef.current = 0;
+  }, [scale]);
 
   const handleScroll = useCallback(() => {
-    const root = scrollRef.current;
-    if (!root) return;
-    const rootTop = root.getBoundingClientRect().top;
-    let closest = 1;
-    let closestDist = Infinity;
-    root.querySelectorAll("[data-page-num]").forEach((el) => {
-      const dist = Math.abs(el.getBoundingClientRect().top - rootTop);
-      if (dist < closestDist) {
-        closestDist = dist;
-        closest = Number(el.dataset.pageNum);
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      const root = scrollRef.current;
+      if (!root) return;
+      const rootTop = root.getBoundingClientRect().top;
+      const limit = root.clientHeight / 3;
+      const nums = Array.from(visibleRef.current).sort((a, b) => a - b);
+      if (!nums.length) return;
+      let current = nums[0];
+      for (const n of nums) {
+        const el = root.querySelector(`[data-page-num="${n}"]`);
+        if (el && el.getBoundingClientRect().top - rootTop <= limit) current = n;
       }
+      setCurrentPage(current);
     });
-    setCurrentPage(closest);
   }, []);
+
+  useEffect(() => {
+    handleScroll();
+  }, [visiblePages, handleScroll]);
 
   const jumpToPage = useCallback(
     (e) => {
       e.preventDefault();
       const n = Math.min(numPages, Math.max(1, parseInt(pageInput, 10) || 1));
       const el = scrollRef.current?.querySelector(`[data-page-num="${n}"]`);
-      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      el?.scrollIntoView({ behavior: "auto", block: "start" });
     },
     [numPages, pageInput]
   );
@@ -228,7 +317,19 @@ export default function CanvasPdfViewer({ fileUrl, authToken, watermarkLines }) 
   }, []);
 
   if (loading) return <p className="state-line">Loading book…</p>;
-  if (error) return <p className="state-line error">{error}</p>;
+  if (error) {
+    return (
+      <div className="state-line error">
+        <p style={{ margin: "0 0 12px" }}>{error}</p>
+        <button type="button" onClick={() => setReloadKey((k) => k + 1)}>
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  const baseWidth = Math.max(240, Math.min(560, containerWidth || 560));
+  const pageWidth = Math.round(baseWidth * scale);
 
   return (
     <div className="canvas-pdf-viewer">
@@ -244,10 +345,10 @@ export default function CanvasPdfViewer({ fileUrl, authToken, watermarkLines }) 
           <span>of {numPages}</span>
         </form>
         <span className="canvas-pdf-toolbar-sep" />
-        <button type="button" onClick={zoomOut} aria-label="Zoom out">
+        <button type="button" onClick={() => changeZoom(-0.2)} aria-label="Zoom out">
           −
         </button>
-        <button type="button" onClick={zoomIn} aria-label="Zoom in">
+        <button type="button" onClick={() => changeZoom(0.2)} aria-label="Zoom in">
           +
         </button>
       </div>
@@ -258,9 +359,10 @@ export default function CanvasPdfViewer({ fileUrl, authToken, watermarkLines }) 
             key={n}
             pdf={pdf}
             pageNum={n}
-            scale={scale}
-            watermarkLines={watermarkLines}
-            scrollRoot={scrollRef}
+            width={pageWidth}
+            defaultAspect={defaultAspect}
+            isVisible={visiblePages.has(n)}
+            epoch={epoch}
           />
         ))}
       </div>
