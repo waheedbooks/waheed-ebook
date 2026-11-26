@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import api from "../api";
 
 const AuthContext = createContext(null);
@@ -9,6 +9,12 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null;
   });
   const [loading, setLoading] = useState(true);
+  const [welcome, setWelcome] = useState(null);
+
+  const showWelcome = useCallback((name) => {
+    setWelcome({ id: Date.now(), name: name || "" });
+  }, []);
+  const dismissWelcome = useCallback(() => setWelcome(null), []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -33,10 +39,11 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
+    setWelcome(null);
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, welcome, showWelcome, dismissWelcome }}>
       {children}
     </AuthContext.Provider>
   );
