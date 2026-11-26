@@ -27,6 +27,7 @@ export default function LoginToast() {
     };
   }, [welcome, paused, leaving]);
 
+  // after the closing animation, remove it completely
   useEffect(() => {
     if (!leaving) return undefined;
     const timer = setTimeout(dismissWelcome, EXIT_MS);
@@ -65,7 +66,11 @@ export default function LoginToast() {
         </span>
         <div className="login-toast-body">
           <strong>You’re logged in</strong>
-          <span>{firstName ? `Welcome back, ${firstName}.` : "Welcome back."}</span>
+          <span>
+            {welcome.isNew
+              ? `Welcome${firstName ? `, ${firstName}` : ""}. Your account is verified.`
+              : `Welcome back${firstName ? `, ${firstName}` : ""}.`}
+          </span>
         </div>
         <button
           type="button"
