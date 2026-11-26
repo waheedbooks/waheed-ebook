@@ -51,4 +51,30 @@ async function sendVerificationEmail(to, verifyUrl) {
   }
 }
 
-module.exports = { sendPasswordResetEmail, sendVerificationEmail };
+async function sendLoginPinEmail(to, pin) {
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": process.env.BREVO_API_KEY,
+      "content-type": "application/json",
+      accept: "application/json",
+    },
+    body: JSON.stringify({
+      sender: { name: "Waheed Books", email: process.env.SMTP_FROM },
+      to: [{ email: to }],
+      subject: `Your login PIN: ${pin} — Waheed Books`,
+      htmlContent: `
+      <p>Hi,</p>
+      <p>Use this 6-digit PIN to finish logging in to Waheed Books. It expires in 10 minutes.</p>
+      <p style="font-size:32px;font-weight:bold;letter-spacing:8px;margin:18px 0;">${pin}</p>
+      <p>If you didn't try to log in, someone may know your password. Please change it
+      using "Forgot password" on the login page. Never share this PIN with anyone.</p>
+    `,
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`Brevo API error ${res.status}: ${await res.text()}`);
+  }
+}
+
+module.exports = { sendPasswordResetEmail, sendVerificationEmail, sendLoginPinEmail };
