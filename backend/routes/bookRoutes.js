@@ -143,7 +143,8 @@ router.get("/:id/pdf", protect, async (req, res) => {
     const range = req.headers.range;
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `inline; filename="${book.title}.pdf"`);
+    // Fixed, plain file name: a title with accents/symbols in a header can make Node throw.
+    res.setHeader("Content-Disposition", 'inline; filename="book.pdf"');
     res.setHeader("Accept-Ranges", "bytes");
 
     const r2Result = await getObjectStream(`books/${book.pdfFile}`, range);
@@ -153,9 +154,19 @@ router.get("/:id/pdf", protect, async (req, res) => {
       res.setHeader("Content-Range", r2Result.ContentRange);
     }
     res.setHeader("Content-Length", r2Result.ContentLength);
+
+    // If the reader's phone drops the connection or scrolls on, stop pulling data from R2.
+    res.on("close", () => {
+      if (!res.writableEnded) r2Result.Body.destroy?.();
+    });
+    r2Result.Body.on("error", (streamErr) => {
+      console.error("PDF stream error:", streamErr.message);
+      res.destroy();
+    });
     r2Result.Body.pipe(res);
   } catch (err) {
     console.error("Stream PDF error:", err);
+    if (res.headersSent) return res.end();
     res.status(500).json({ message: "Could not load PDF" });
   }
 });
@@ -185,7 +196,6 @@ router.get("/:id/chapters/:chapterId", protect, async (req, res) => {
       bookTitle: book.title,
       title: chapter.title,
       content: chapter.content,
-      viewer: { name: req.user.name, email: req.user.email },
     });
   } catch (err) {
     console.error("Get chapter error:", err);
