@@ -9,7 +9,7 @@ export default function VerifyEmail() {
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [resendStatus, setResendStatus] = useState("idle");
-  const { login } = useAuth();
+  const { login, showWelcome } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,6 +17,7 @@ export default function VerifyEmail() {
       .post(`/auth/verify-email/${token}`)
       .then((res) => {
         login(res.data.token, res.data.user);
+        showWelcome(res.data.user?.name, true); // first time in: the email link logs them in
         setStatus("done");
         setTimeout(() => navigate("/"), 1500);
       })
