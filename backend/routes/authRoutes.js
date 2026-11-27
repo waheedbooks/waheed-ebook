@@ -11,6 +11,7 @@ const {
 
 const router = express.Router();
 
+// A login session lasts 2 days.
 const SESSION_LENGTH = "2d";
 
 // Login PIN settings
@@ -145,8 +146,9 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // PIN switched off: log in straight away (email + password only).
-    if (!pinRequired()) {
+    // Admin accounts skip the PIN (the admin email is not a real inbox), and so does
+    // everyone when the PIN is switched off: log in with email + password only.
+    if (!pinRequired() || user.role === "admin") {
       const sessionId = await startNewSession(user);
       const token = signToken(user, sessionId);
       return res.json({
