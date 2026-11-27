@@ -7,9 +7,9 @@ async function sendPasswordResetEmail(to, resetUrl) {
       accept: "application/json",
     },
     body: JSON.stringify({
-      sender: { name: "The Reading Room", email: process.env.SMTP_FROM },
+      sender: { name: "Waheed Books", email: process.env.SMTP_FROM },
       to: [{ email: to }],
-      subject: "Reset your password — The Reading Room",
+      subject: "Reset your password — Waheed Books",
       htmlContent: `
       <p>Hi,</p>
       <p>We received a request to reset the password for your account. Click the link
@@ -36,7 +36,7 @@ async function sendVerificationEmail(to, verifyUrl) {
     body: JSON.stringify({
       sender: { name: "Waheed Books", email: process.env.SMTP_FROM },
       to: [{ email: to }],
-      subject: "Verify your email — The Reading Room",
+      subject: "Verify your email — Waheed Books",
       htmlContent: `
       <p>Hi,</p>
       <p>Thanks for signing up. Click the link below to verify your email address and
