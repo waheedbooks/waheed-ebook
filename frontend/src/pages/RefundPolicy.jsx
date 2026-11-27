@@ -50,7 +50,8 @@ export default function RefundPolicy() {
         <ul>
           <li>
             Once you have opened and read the book in the online reader, because
-            digital content cannot be returned.
+            digital content cannot be returned (except for missing or unreadable
+            pages, see the note below).
           </li>
           <li>
             Change of mind after access to the book has been used.
@@ -61,6 +62,11 @@ export default function RefundPolicy() {
             login details or copying content).
           </li>
         </ul>
+        <div className="legal-highlight">
+          <strong>Missing or unreadable pages:</strong> If you discover missing or
+          unreadable pages after opening the book, please contact us. If we cannot
+          fix the problem, we will refund your purchase.
+        </div>
       </section>
 
       <section className="legal-section">
