@@ -134,9 +134,10 @@ export default function Reader() {
     return (
       <div className="pdf-reader">
         <div className="pdf-reader-bar">
-          <Link to={`/books/${id}`} className="pdf-reader-back">
-            ← {book.title}
-          </Link>
+          {/* Plain text, not a link: the title does not lead to the book page */}
+          <span style={{ color: "var(--text-on-ink)", fontSize: "0.94rem", fontWeight: 600 }}>
+            {book.title}
+          </span>
         </div>
         <div className="pdf-reader-frame">
           {checkingAccess && <p className="state-line">Loading book…</p>}
